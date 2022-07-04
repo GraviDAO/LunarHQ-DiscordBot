@@ -1,0 +1,26 @@
+export class UserDocMissingError extends Error {
+  constructor(m: string) {
+    super(m);
+
+    // Set the prototype explicitly.
+    Object.setPrototypeOf(this, UserDocMissingError.prototype);
+  }
+}
+
+export class APICallError extends Error {
+  constructor(m: string) {
+    super(m);
+
+    // Set the prototype explicitly.
+    Object.setPrototypeOf(this, APICallError.prototype);
+  }
+}
+
+export class TokenFetchingError extends Error {
+  constructor(m: string) {
+    super(m);
+
+    // Set the prototype explicitly.
+    Object.setPrototypeOf(this, TokenFetchingError.prototype);
+  }
+}
