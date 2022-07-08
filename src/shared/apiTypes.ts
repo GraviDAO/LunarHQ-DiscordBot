@@ -20,6 +20,17 @@ export type NftCollection = {
   updatedAt: string,
 }
 
-export type GetRulesResponse = {
-  message: ServerRule[],
+export interface GenericRule {
+  id: string,
+  blockchainName: string,
+  address: string,
+  quantity: number | null,
+  role: string,
+  tokenIds: string[] | null,
+  apiUrl: string,
+  createdAt: Date,
+}
+
+export interface GetRulesResponse {
+  rules: GenericRule[],
 }

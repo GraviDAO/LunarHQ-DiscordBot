@@ -157,10 +157,10 @@ export default {
         .setDescription(
           "Remove a rule based on its index in the output of `/list-rules`"
         )
-        .addNumberOption((option) =>
+        .addStringOption((option) =>
           option
-            .setName("rule-number")
-            .setDescription("The index of the rule to remove.")
+            .setName("rule-id")
+            .setDescription("The id of the rule to remove.")
             .setRequired(true)
         )
     ),
@@ -528,9 +528,10 @@ export default {
           const config = {
             headers: {
                Authorization: "Bearer " + token
-            }
-          }
-
+            },
+            params: { discordServerId: interaction.guildId },
+          };
+          console.log(`Sending request ${JSON.stringify(config)}`);
           response = await axios.get(lunarHQ_url + "getRules", config);
           if(response.status == 200)
           {
@@ -543,8 +544,8 @@ export default {
           console.error(e);
         }
 
-      const getRulesResponse = response?.data as GetRulesResponse;
-      const serverRules = getRulesResponse.message;
+      const getRulesResponse = response?.data.message as GetRulesResponse;
+      const serverRules = getRulesResponse.rules;
 
       if (serverRules.length == 0) {
         await interaction.reply({
@@ -559,19 +560,19 @@ export default {
       for(let index = 0; index < serverRules.length; index++)
       {
         let roleName = guild.roles.cache.find(
-          (role) => role.id == serverRules[index].discordRole
+          (role) => role.id == serverRules[index].role
         )?.name;
 
         const prettyRule = {
           ruleId: serverRules[index].id,
-          nftAddress: serverRules[index].nftCollection.address,
+          nftAddress: serverRules[index].address,
           apiUrl: serverRules[index].apiUrl,
           quantity: serverRules[index].quantity,
           role: roleName,
           createdTimestamp: serverRules[index].createdAt,
         }
 
-        res[`rule-${serverRules[index].id}`] = prettyRule;
+        res[`rule ${serverRules[index].id}`] = prettyRule;
       }
 
       // reply with list of configured rules
@@ -586,17 +587,27 @@ export default {
         ],
       });
     } else if (interaction.options.getSubcommand() === "remove-rule") {
-      const ruleNumber = interaction.options.getNumber("rule-number");
-
-      if (ruleNumber == undefined) {
+      const ruleId = interaction.options.getString("rule-id");
+      if(ruleId == null)
+      {
         await interaction.reply({
-          content: "Please specify a rule number and try again",
+          content: "Please specify a ruleId and try again",
           ephemeral: true,
         });
         return;
       }
-
-      let response = await axios.delete(lunarHQ_url + "deleteRule/" + ruleNumber, { params: { discordServerId: interaction.guildId }});
+      const idType = ruleId.split("-", 1)[0];
+      const id = ruleId.split("-", 1)[1];
+      if(idType != "N" && idType != "S" && idType != "T")
+      {
+        await interaction.reply({
+          content: "invalid ruleId. RuleId starts with N, T or S, is followed by a - and ends with a number",
+          ephemeral: true,
+        });
+        return;
+      }
+      
+      let response = await axios.delete(lunarHQ_url + "deleteRule/" + ruleId, { params: { discordServerId: interaction.guildId }});
 
       // reply
       await interaction.reply({
