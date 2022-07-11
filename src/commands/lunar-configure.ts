@@ -1,18 +1,15 @@
-import jwt from "jsonwebtoken";
-import { API_SECRET } from "../../config.json";
-import axios from "axios";
 import { SlashCommandBuilder } from "@discordjs/builders";
 import { CommandInteraction, MessageAttachment } from "discord.js";
 import { LunarAssistant } from "..";
-import db from "../services/admin";
-import { GuildConfig, GuildRule } from "../shared/firestoreTypes";
-import { GetRulesResponse, ServerRule } from "../shared/apiTypes";
 import {
-  guildRuleToSimpleRule,
-  simpleRuleToHumanSimpleRule,
-} from "../utils/guildRuleHelpers";
+  apiRuleData,
+  nftRuleData,
+  stakedNftRuleData,
+  tokenRuleData,
+} from "../shared/apiTypes";
 import { isValidHttpUrl } from "../utils/helper";
-import { lunarHQ_url, botName } from "../../config.json";
+import { api } from "../services/api";
+import { isValidTerraAddress } from "../utils/isValidTerraAddress";
 
 export default {
   data: new SlashCommandBuilder()
@@ -40,6 +37,16 @@ export default {
               "The blockchain name to which the nft-address belongs."
             )
             .setRequired(true)
+            .addChoices(
+              {
+                value: "Terra",
+                name: "Terra",
+              },
+              {
+                value: "Terra Classic",
+                name: "Terra Classic",
+              }
+            )
         )
         .addRoleOption((option) =>
           option
@@ -70,11 +77,37 @@ export default {
         )
         .addStringOption((option) =>
           option
+            .setName("nft-address")
+            .setDescription(
+              "The contract address against which to check for nft ownership for this rule."
+            )
+            .setRequired(true)
+        )
+        .addStringOption((option) =>
+          option
             .setName("staked-nft-address")
             .setDescription(
               "The contract address against which to check for nft staking for this rule."
             )
             .setRequired(true)
+        )
+        .addStringOption((option) =>
+          option
+            .setName("blockchain")
+            .setDescription(
+              "The blockchain name to which the nft-address belongs."
+            )
+            .setRequired(true)
+            .addChoices(
+              {
+                value: "Terra",
+                name: "Terra",
+              },
+              {
+                value: "Terra Classic",
+                name: "Terra Classic",
+              }
+            )
         )
         .addRoleOption((option) =>
           option
@@ -111,6 +144,24 @@ export default {
             )
             .setRequired(true)
         )
+        .addStringOption((option) =>
+          option
+            .setName("blockchain")
+            .setDescription(
+              "The blockchain name to which the nft-address belongs."
+            )
+            .setRequired(true)
+            .addChoices(
+              {
+                value: "Terra",
+                name: "Terra",
+              },
+              {
+                value: "Terra Classic",
+                name: "Terra Classic",
+              }
+            )
+        )
         .addRoleOption((option) =>
           option
             .setName("role")
@@ -138,6 +189,24 @@ export default {
               "Format: 'https://yourApiUrl.com?wallet=$(wallet)' $(wallet) will be replaced by user wallet address"
             )
             .setRequired(true)
+        )
+        .addStringOption((option) =>
+          option
+            .setName("blockchain")
+            .setDescription(
+              "The blockchain name to which the nft-address belongs."
+            )
+            .setRequired(true)
+            .addChoices(
+              {
+                value: "Terra",
+                name: "Terra",
+              },
+              {
+                value: "Terra Classic",
+                name: "Terra Classic",
+              }
+            )
         )
         .addRoleOption((option) =>
           option
@@ -172,448 +241,338 @@ export default {
     if (!interaction.guildId || !interaction.guild || !interaction.member)
       return;
 
-    if (interaction.options.getSubcommand() === "add-nft-rule") {
-      // configure the server settings
-      const nftAddress = interaction.options.getString("nft-address")?.toLowerCase();
-      const blockchainName = interaction.options.getString("blockchain");
-      const role = interaction.options.getRole("role");
-      const rawQuantity = interaction.options.getNumber("quantity");
-      const rawTokenIds = interaction.options.getString("token-ids");
+    await interaction.deferReply({ ephemeral: true });
 
-      // verify that nftAddress and role are defined
-      if (!nftAddress || !role) {
-        await interaction.reply({
-          content: "Could not get nftAddress or role",
-          ephemeral: true,
-        });
-        return;
-      }
+    let nftAddress;
+    let stakedNftAddress;
+    let blockchainName;
+    let role;
+    let rawQuantity;
+    let rawTokenIds;
+    let cw20Address;
+    let apiUrl;
+    let ruleNumber;
+    let tokenIds;
 
-      if (!blockchainName) {
-        await interaction.reply({
-          content: "Could not get blockchainName parameter",
-          ephemeral: true,
-        });
-        return;
-      }
+    switch (interaction.options.getSubcommand(true)) {
+      case "add-nft-rule":
+        // configure the server settings
+        nftAddress = interaction.options
+          .getString("nft-address", true)
+          .toLowerCase();
+        blockchainName = interaction.options.getString("blockchain", true);
+        role = interaction.options.getRole("role", true);
+        rawQuantity = interaction.options.getNumber("quantity") ?? 1;
+        rawTokenIds = interaction.options.getString("token-ids");
 
-      if(nftAddress.length != 44 || !nftAddress.startsWith("terra",0)) {
-        await interaction.reply({
-          content: "Invalid terra address",
-          ephemeral: true,
-        });
-        return;
-      }
-
-
-      // verify that we can parse tokenIds
-      let tokenIds;
-      try {
-        tokenIds = rawTokenIds ? JSON.parse(rawTokenIds) : undefined;
-        // check that the tokenIds is properly formatted
-        if (
-          tokenIds &&
-          !(
-            Array.isArray(tokenIds) &&
-            tokenIds.every((tokenId) => typeof tokenId == "string")
-          )
-        ) {
-          throw new Error("Token ids are not an array of strings");
+        if (!isValidTerraAddress(nftAddress)) {
+          await interaction.editReply({
+            content: "Invalid terra address",
+          });
+          return;
         }
-      } catch {
-        await interaction.reply({
-          content:
-          'Could not parse token ids, please pass token ids in the following format: ["1", "2", "4"] and if it is a single entry write ["#"] and make sure to use the "-sign and not the similar looking “-sign!!! Write ["#"] not [“#“].',
-          ephemeral: true,
-        });
-        return;
-      }
 
-      const quantity = rawQuantity ? rawQuantity : 1;
+        // verify that we can parse tokenIds
+        try {
+          tokenIds = rawTokenIds ? JSON.parse(rawTokenIds) : undefined;
+          // check that the tokenIds is properly formatted
+          if (
+            tokenIds &&
+            !(
+              Array.isArray(tokenIds) &&
+              tokenIds.every((tokenId) => typeof tokenId == "string")
+            )
+          ) {
+            throw new Error("Token ids are not an array of strings");
+          }
+        } catch {
+          await interaction.editReply({
+            content:
+              'Could not parse token ids, please pass token ids in the following format: ["1", "2", "4"] and if it is a single entry write ["#"] and make sure to use the "-sign and not the similar looking “-sign!!! Write ["#"] not [“#“].',
+          });
+          return;
+        }
 
-      // check if the bot role is above the verified role
-      const lunarAssistantRole = interaction.guild.roles.cache.find(
-        (role) => role.name == botName
-      )!;
+        // check if the bot role is above the verified role
+        if (role.position > interaction.guild.me!.roles.highest.position) {
+          await interaction.editReply({
+            content: `Please update the role hierarchy with my highest role above of ${role.name} and try again.`,
+          });
+          return;
+        }
 
-      if (role.position > lunarAssistantRole.position) {
-        await interaction.reply({
-          content: `Please update the role hierarchy with 'Lunar Assistant' above of ${role.name} and try again.`,
-          ephemeral: true,
-        });
-        return;
-      }
-
-      try {
-        const response = await axios.post(lunarHQ_url + "addNftRule", {
+        const addNftRuleData: nftRuleData = {
           nftAddress: nftAddress,
-          tokenIds:  {...(tokenIds && { tokenIds })},
-          quantity: quantity,
+          tokenIds: { ...(tokenIds && { tokenIds }) },
+          quantity: rawQuantity,
           role: role.id,
           discordServerId: interaction.guild.id,
           blockchainName: blockchainName,
-        })
-        if(response.status == 200)
-        {
-          console.log("Successfully created new nft rule");
-        }
-        else { console.log("unexpected response from api: " + response.status); }
-    
-       
-      } catch (e) {
-        console.error(e);
-      }
-      
-      // reply
-      await interaction.reply({
-        content: "Rule added successfully!",
-        ephemeral: true,
-      });
-    } else if (interaction.options.getSubcommand() === "add-staked-nft-rule") {
-      // configure the server settings
-      const nftAddress = interaction.options.getString("staked-nft-address")?.toLowerCase();
-      const role = interaction.options.getRole("role");
-      const rawQuantity = interaction.options.getNumber("quantity");
-      const rawTokenIds = interaction.options.getString("token-ids");
+        };
 
-      // verify that nftAddress and role are defined
-      if (!nftAddress || !role) {
-        await interaction.reply({
-          content: "Could not get nftAddress or role",
-          ephemeral: true,
-        });
-        return;
-      }
-
-      if(nftAddress.length != 44 || !nftAddress.startsWith("terra",0)) {
-        await interaction.reply({
-          content: "Invalid terra address",
-          ephemeral: true,
-        });
-        return;
-      }
-
-      // verify that we can parse tokenIds
-      let tokenIds;
-      try {
-        tokenIds = rawTokenIds ? JSON.parse(rawTokenIds) : undefined;
-        // check that the tokenIds is properly formatted
-        if (
-          tokenIds &&
-          !(
-            Array.isArray(tokenIds) &&
-            tokenIds.every((tokenId) => typeof tokenId == "string")
-          )
-        ) {
-          throw new Error("Token ids are not an array of strings");
-        }
-      } catch {
-        await interaction.reply({
-          content:
-            'Could not parse token ids, please pass token ids in the following format: ["1", "2", "4"] and if it is a single entry write ["#"] and make sure to use the "-sign and not the similar looking “-sign!!! Write ["#"] not [“#“].',
-          ephemeral: true,
-        });
-        return;
-      }
-
-      const quantity = rawQuantity ? rawQuantity : 1;
-
-      // check if the bot role is above the verified role
-      const lunarAssistantRole = interaction.guild.roles.cache.find(
-        (role) => role.name == botName
-      )!;
-
-      if (role.position > lunarAssistantRole.position) {
-        await interaction.reply({
-          content: `Please update the role hierarchy with 'Lunar Assistant' above of ${role.name} and try again.`,
-          ephemeral: true,
-        });
-        return;
-      }
-
-      const newRule: GuildRule = {
-        version: "1.0",
-        nft: {},
-        stakedNFT: {
-          [nftAddress]: {
-            // only include tokenIds if defined
-            ...(tokenIds && { tokenIds }),
-            quantity,
-          },
-        },
-        cw20: {},
-        api: {},
-        nativeToken: {},
-        roleId: role.id,
-      };
-
-      const guildConfigDoc = await db
-        .collection("guildConfigs")
-        .doc(interaction.guildId)
-        .get();
-
-      const guildConfig: GuildConfig = guildConfigDoc.exists
-        ? (guildConfigDoc.data() as GuildConfig)
-        : { rules: [] };
-
-      guildConfig.rules.push(newRule);
-
-      // update the db
-      await db
-        .collection("guildConfigs")
-        .doc(interaction.guildId)
-        .set(guildConfig);
-
-      // reply
-      await interaction.reply({
-        content: "Rule added successfully!",
-        ephemeral: true,
-      });
-    } else if (interaction.options.getSubcommand() === "add-cw20-rule") {
-      // configure the server settings
-      const cw20Address = interaction.options.getString("cw20-address")?.toLowerCase();
-      const role = interaction.options.getRole("role");
-      const rawQuantity = interaction.options.getNumber("quantity");
-
-      // verify that nftAddress and role are defined
-      if (!cw20Address || !role) {
-        await interaction.reply({
-          content: "Could not get cw20Address or role",
-          ephemeral: true,
-        });
-        return;
-      }
-
-      if(cw20Address.length != 44 || !cw20Address.startsWith("terra",0)) {
-        await interaction.reply({
-          content: "Invalid terra address",
-          ephemeral: true,
-        });
-        return;
-      }
-
-      const quantity = rawQuantity ? rawQuantity : 1;
-
-      // Check if the bot role is above the verified role
-      const lunarAssistantRole = interaction.guild.roles.cache.find(
-        (role) => role.name == botName
-      )!;
-
-      if (role.position > lunarAssistantRole.position) {
-        await interaction.reply({
-          content: `Please update the role hierarchy with 'Lunar Assistant' above of ${role.name} and try again.`,
-          ephemeral: true,
-        });
-        return;
-      }
-
-      const newRule: GuildRule = {
-        version: "1.0",
-        nft: {},
-        stakedNFT: {},
-        cw20: {
-          [cw20Address]: {
-            quantity,
-          },
-        },
-        api: {},
-        nativeToken: {},
-        roleId: role.id,
-      };
-
-      const guildConfigDoc = await db
-        .collection("guildConfigs")
-        .doc(interaction.guildId)
-        .get();
-
-      const guildConfig: GuildConfig = guildConfigDoc.exists
-        ? (guildConfigDoc.data() as GuildConfig)
-        : { rules: [] };
-
-      guildConfig.rules.push(newRule);
-
-      // update the db
-      await db
-        .collection("guildConfigs")
-        .doc(interaction.guildId)
-        .set(guildConfig);
-
-      // reply
-      await interaction.reply({
-        content: "Rule added successfully!",
-        ephemeral: true,
-      });
-    } else if (interaction.options.getSubcommand() === "add-api-rule") {
-      // configure the server settings
-      const apiUrl = interaction.options.getString("api-url");
-      const role = interaction.options.getRole("role");
-
-      // verify that nftAddress and role are defined
-      if (!apiUrl || !role) {
-        await interaction.reply({
-          content: "Could not get api-url or role",
-          ephemeral: true,
-        });
-        return;
-      } else if (!isValidHttpUrl(apiUrl)) {
-        //Verify url is valid
-        await interaction.reply({
-          content: "api-url is not a valid url",
-          ephemeral: true,
-        });
-        return;
-      }
-
-      // check if the bot role is above the verified role
-      const lunarAssistantRole = interaction.guild.roles.cache.find(
-        (role) => role.name == botName
-      )!;
-
-      if (role.position > lunarAssistantRole.position) {
-        await interaction.reply({
-          content: `Please update the role hierarchy with 'Lunar Assistant' above of ${role.name} and try again.`,
-          ephemeral: true,
-        });
-        return;
-      }
-
-      const newRule: GuildRule = {
-        version: "1.0",
-        nft: {},
-        stakedNFT: {},
-        cw20: {},
-        api: {
-          [apiUrl]: {},
-        },
-        nativeToken: {},
-        roleId: role.id,
-      };
-
-      const guildConfigDoc = await db
-        .collection("guildConfigs")
-        .doc(interaction.guildId)
-        .get();
-
-      const guildConfig: GuildConfig = guildConfigDoc.exists
-        ? (guildConfigDoc.data() as GuildConfig)
-        : { rules: [] };
-
-      guildConfig.rules.push(newRule);
-
-      // update the db
-      await db
-        .collection("guildConfigs")
-        .doc(interaction.guildId)
-        .set(guildConfig);
-
-      // reply
-      await interaction.reply({
-        content: "Rule added successfully!",
-        ephemeral: true,
-      });
-    } else if (interaction.options.getSubcommand() === "view-rules") {
-      if (!interaction.guildId || !interaction.guild || !interaction.member)
-        return;
-
-       let guild = interaction.guild;
-
-       let response;
         try {
-          const token = jwt.sign(
-            { discordServerId: interaction.guildId, accessTypes: ["getRules"] },
-            API_SECRET,
-            { expiresIn: "15m" }
-          );
-          
-          const config = {
-            headers: {
-               Authorization: "Bearer " + token
-            },
-            params: { discordServerId: interaction.guildId },
-          };
-          console.log(`Sending request ${JSON.stringify(config)}`);
-          response = await axios.get(lunarHQ_url + "getRules", config);
-          if(response.status == 200)
-          {
-            console.log("Successfully retrieved nft rules: " + JSON.stringify(response.data));
-          }
-          else { console.log("unexpected response from api: " + response.status); }
-      
-         
+          await api.addNftRule(addNftRuleData);
         } catch (e) {
           console.error(e);
+          await interaction.editReply({
+            content:
+              "Could not create the rule for this server, please try again later.",
+          });
+          return;
         }
 
-      const getRulesResponse = response?.data.message as GetRulesResponse;
-      const serverRules = getRulesResponse.rules;
-
-      if (serverRules.length == 0) {
-        await interaction.reply({
-          content:
-            "You haven't created any rules yet. Please run `/lunar-configure add-nft-rule` and try again",
-          ephemeral: true,
+        // reply
+        await interaction.editReply({
+          content: "Rule added successfully!",
         });
-        return;
-      }
+        break;
 
-      const res: any = {};
-      for(let index = 0; index < serverRules.length; index++)
-      {
-        let roleName = guild.roles.cache.find(
-          (role) => role.id == serverRules[index].role
-        )?.name;
+      case "add-staked-nft-rule":
+        // configure the server settings
+        nftAddress = interaction.options
+          .getString("nft-address", true)
+          .toLowerCase();
+        stakedNftAddress = interaction.options
+          .getString("staked-nft-address", true)
+          .toLowerCase();
+        blockchainName = interaction.options.getString("blockchain", true);
+        role = interaction.options.getRole("role", true);
+        rawQuantity = interaction.options.getNumber("quantity") ?? 1;
+        rawTokenIds = interaction.options.getString("token-ids");
 
-        const prettyRule = {
-          ruleId: serverRules[index].id,
-          nftAddress: serverRules[index].address,
-          apiUrl: serverRules[index].apiUrl,
-          quantity: serverRules[index].quantity,
-          role: roleName,
-          createdTimestamp: serverRules[index].createdAt,
+        if (!isValidTerraAddress(nftAddress)) {
+          await interaction.editReply({
+            content: "Invalid terra address",
+          });
+          return;
         }
 
-        res[`rule ${serverRules[index].id}`] = prettyRule;
-      }
+        if (!isValidTerraAddress(stakedNftAddress)) {
+          await interaction.editReply({
+            content: "Invalid staked terra address",
+          });
+          return;
+        }
 
-      // reply with list of configured rules
-      await interaction.reply({
-        content: "Your configured rules are attached!",
-        ephemeral: true,
-        files: [
-          new MessageAttachment(
-            Buffer.from(JSON.stringify(res, null, 4)),
-            `lunar-assistant-rules.txt`
-          ),
-        ],
-      });
-    } else if (interaction.options.getSubcommand() === "remove-rule") {
-      const ruleId = interaction.options.getString("rule-id");
-      if(ruleId == null)
-      {
-        await interaction.reply({
-          content: "Please specify a ruleId and try again",
-          ephemeral: true,
-        });
-        return;
-      }
-      const idType = ruleId.split("-", 1)[0];
-      const id = ruleId.split("-", 1)[1];
-      if(idType != "N" && idType != "S" && idType != "T")
-      {
-        await interaction.reply({
-          content: "invalid ruleId. RuleId starts with N, T or S, is followed by a - and ends with a number",
-          ephemeral: true,
-        });
-        return;
-      }
-      
-      let response = await axios.delete(lunarHQ_url + "deleteRule/" + ruleId, { params: { discordServerId: interaction.guildId }});
+        // verify that we can parse tokenIds
+        try {
+          tokenIds = rawTokenIds ? JSON.parse(rawTokenIds) : undefined;
+          // check that the tokenIds is properly formatted
+          if (
+            tokenIds &&
+            !(
+              Array.isArray(tokenIds) &&
+              tokenIds.every((tokenId) => typeof tokenId == "string")
+            )
+          ) {
+            throw new Error("Token ids are not an array of strings");
+          }
+        } catch {
+          await interaction.editReply({
+            content:
+              'Could not parse token ids, please pass token ids in the following format: ["1", "2", "4"] and if it is a single entry write ["#"] and make sure to use the "-sign and not the similar looking “-sign!!! Write ["#"] not [“#“].',
+          });
+          return;
+        }
 
-      // reply
-      await interaction.reply({
-        content: "Rule removed successfully!",
-        ephemeral: true,
-      });
+        // check if the bot role is above the verified role
+        if (role.position > interaction.guild.me!.roles.highest.position) {
+          await interaction.editReply({
+            content: `Please update the role hierarchy with my highest role above of ${role.name} and try again.`,
+          });
+          return;
+        }
+
+        const addStakedNftRuleData: stakedNftRuleData = {
+          nftAddress: nftAddress,
+          stakedNftAddress: stakedNftAddress,
+          tokenIds: { ...(tokenIds && { tokenIds }) },
+          quantity: rawQuantity,
+          role: role.id,
+          discordServerId: interaction.guild.id,
+          blockchainName: blockchainName,
+        };
+
+        try {
+          await api.addStakedNftRule(addStakedNftRuleData);
+        } catch (e) {
+          console.error(e);
+          await interaction.editReply({
+            content:
+              "Could not create the rule for this server, please try again later.",
+          });
+          return;
+        }
+
+        // reply
+        await interaction.editReply({
+          content: "Rule added successfully!",
+        });
+        break;
+
+      case "add-cw20-rule":
+        // configure the server settings
+        cw20Address = interaction.options
+          .getString("cw20-address", true)
+          .toLowerCase();
+        blockchainName = interaction.options.getString("blockchain", true);
+        role = interaction.options.getRole("role", true);
+        rawQuantity = interaction.options.getNumber("quantity") ?? 1;
+
+        if (!isValidTerraAddress(cw20Address)) {
+          await interaction.editReply({
+            content: "Invalid terra address",
+          });
+          return;
+        }
+
+        // Check if the bot role is above the verified role
+        if (role.position > interaction.guild.me!.roles.highest.position) {
+          await interaction.editReply({
+            content: `Please update the role hierarchy with my highest role above of ${role.name} and try again.`,
+          });
+          return;
+        }
+
+        const addCw20RuleData: tokenRuleData = {
+          tokenAddress: cw20Address,
+          blockchainName: blockchainName,
+          quantity: rawQuantity,
+          role: role.id,
+          discordServerId: interaction.guild.id,
+        };
+
+        try {
+          await api.addTokenRule(addCw20RuleData);
+        } catch (e) {
+          console.error(e);
+          await interaction.editReply({
+            content:
+              "Could not create the rule for this server, please try again later.",
+          });
+          return;
+        }
+
+        // reply
+        await interaction.editReply({
+          content: "Rule added successfully!",
+        });
+        break;
+
+      case "add-api-rule":
+        // configure the server settings
+        apiUrl = interaction.options.getString("api-url", true);
+        blockchainName = interaction.options.getString("blockchain", true);
+        role = interaction.options.getRole("role", true);
+
+        if (!isValidHttpUrl(apiUrl)) {
+          //Verify url is valid
+          await interaction.editReply({
+            content: "api-url is not a valid url",
+          });
+          return;
+        }
+
+        // check if the bot role is above the verified role
+        if (role.position > interaction.guild.me!.roles.highest.position) {
+          await interaction.editReply({
+            content: `Please update the role hierarchy with my highest role above of ${role.name} and try again.`,
+          });
+          return;
+        }
+
+        const addApiRule: apiRuleData = {
+          apiUrl: apiUrl,
+          blockchainName: blockchainName,
+          role: role.id,
+          discordServerId: interaction.guild.id,
+        };
+
+        try {
+          await api.addApiRule(addApiRule);
+        } catch (e) {
+          console.error(e);
+          await interaction.editReply({
+            content:
+              "Could not create the rule for this server, please try again later.",
+          });
+          return;
+        }
+
+        // reply
+        await interaction.editReply({
+          content: "Rule added successfully!",
+        });
+        break;
+
+      case "view-rules":
+        let getRulesResponse;
+        try {
+          getRulesResponse = await api.getNftRules(interaction.guildId);
+        } catch (e) {
+          console.error(e);
+          await interaction.editReply({
+            content:
+              "Could not get rules for this server, please try again later.",
+          });
+          return;
+        }
+        const serverRules = getRulesResponse.rules;
+
+        if (serverRules.length == 0) {
+          await interaction.editReply({
+            content:
+              "You haven't created any rules yet. Please run `/lunar-configure add-nft-rule` and try again.",
+          });
+          return;
+        }
+
+        const res = serverRules.map((rule) => {
+          let roleName = interaction.guild!.roles.cache.find(
+            (role) => role.id == rule.role
+          )?.name;
+
+          return {
+            ruleId: rule.id,
+            nftAddress: rule.address,
+            apiUrl: rule.apiUrl,
+            quantity: rule.quantity,
+            role: roleName,
+            createdTimestamp: rule.createdAt,
+          };
+        });
+
+        // reply with list of configured rules
+        await interaction.editReply({
+          content: "Your configured rules are attached!",
+          files: [
+            new MessageAttachment(
+              Buffer.from(JSON.stringify(res, null, 4)),
+              `lunar-assistant-rules.txt`
+            ),
+          ],
+        });
+        break;
+
+      case "remove-rule":
+        ruleNumber = interaction.options.getString("rule-id", true);
+
+        try {
+          await api.deleteRule(interaction.guildId, ruleNumber);
+        } catch (e) {
+          console.error(e);
+          await interaction.editReply({
+            content:
+              "Could not delete the rule for this server, please try again later.",
+          });
+          return;
+        }
+
+        // reply
+        await interaction.editReply({
+          content: "Rule removed successfully!",
+        });
+        break;
     }
   },
 };

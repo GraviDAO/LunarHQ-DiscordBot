@@ -16,3 +16,4 @@ lunar-assistant-bot-2022-03-30.log
 tests/utils/temp.test.ts
 tests/DELETEME.json
 .vscode/launch.json
+.vscode/settings.json
