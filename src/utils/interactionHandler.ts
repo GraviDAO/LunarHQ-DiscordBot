@@ -1,10 +1,16 @@
 import { Collection, Interaction } from "discord.js";
 import path from "path";
 import { LunarAssistant } from "..";
-import { ButtonData, ContextMenuData, SlashCommandData } from "../types";
+import {
+  ButtonData,
+  ContextMenuData,
+  ModalData,
+  SlashCommandData,
+} from "../types";
 import { commandFiles } from "./commandFiles";
 import { buttonFiles } from "./buttonFiles";
 import { contextMenuFiles } from "./contextMenuFiles";
+import { modalFiles } from "./modalFiles";
 
 // Create a collection for the command handles
 const commandHandlers = new Collection<string, SlashCommandData>();
@@ -12,6 +18,8 @@ const commandHandlers = new Collection<string, SlashCommandData>();
 const buttonHandlers = new Collection<string, ButtonData>();
 // Create a collection for the user context menus handles
 const contextMenusHandlers = new Collection<string, ContextMenuData>();
+// Create a collection for the modal handles
+const modalHandlers = new Collection<string, ModalData>();
 
 // Populate the command handlers collection
 for (const file of commandFiles) {
@@ -35,7 +43,10 @@ for (const file of buttonFiles) {
 
 // Populate the context menus handlers collection
 for (const file of contextMenuFiles) {
-  const contextMenuFilePath = path.resolve(__dirname, `../contextMenus/${file}`);
+  const contextMenuFilePath = path.resolve(
+    __dirname,
+    `../contextMenus/${file}`
+  );
   const contextMenu = require(contextMenuFilePath).default;
 
   // Set a new item in the Collection
@@ -43,11 +54,29 @@ for (const file of contextMenuFiles) {
   contextMenusHandlers.set(contextMenu.data.name, contextMenu);
 }
 
+// Populate the modal handlers collection
+for (const file of modalFiles) {
+  const modalFilePath = path.resolve(__dirname, `../modals/${file}`);
+  const modal = require(modalFilePath).default;
+
+  // Set a new item in the Collection
+  // With the key as the modal name and the value as the exported module
+  modalHandlers.set(modal.customId, modal);
+}
+
 export async function interactionHandler(
   this: LunarAssistant,
   interaction: Interaction
 ) {
-  if (!(interaction.isCommand() || interaction.isButton() || interaction.isMessageContextMenu())) return;
+  if (
+    !(
+      interaction.isCommand() ||
+      interaction.isButton() ||
+      interaction.isMessageContextMenu() ||
+      interaction.isModalSubmit()
+    )
+  )
+    return;
 
   if (interaction.isCommand()) {
     // get the command handler
@@ -72,7 +101,7 @@ export async function interactionHandler(
     }
   }
   if (interaction.isButton()) {
-    // get the button handler    
+    // get the button handler
     const button = buttonHandlers.get(interaction.customId.split(".")[0]);
 
     if (!button) return;
@@ -94,7 +123,7 @@ export async function interactionHandler(
     }
   }
   if (interaction.isMessageContextMenu()) {
-    // get the button handler    
+    // get the button handler
     const contextMenu = contextMenusHandlers.get(interaction.commandName);
 
     if (!contextMenu) return;
@@ -115,5 +144,26 @@ export async function interactionHandler(
       });
     }
   }
+  if (interaction.isModalSubmit()) {
+    // get the modal handler
+    const modal = modalHandlers.get(interaction.customId.split(".")[0]);
 
+    if (!modal) return;
+
+    // try to run the modal handler
+    try {
+      await modal.execute(this, interaction);
+    } catch (error) {
+      console.error(error);
+      if (interaction.replied || interaction.deferred) {
+        await interaction.editReply({
+          content: "There was an error while executing this command!",
+        });
+      }
+      await interaction.reply({
+        content: "There was an error while executing this command!",
+        ephemeral: true,
+      });
+    }
+  }
 }

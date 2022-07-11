@@ -1,5 +1,4 @@
 import { SlashCommandBuilder } from "@discordjs/builders";
-import { showModal } from "discord-modals";
 import { AutocompleteInteraction, CommandInteraction } from "discord.js";
 import { LunarAssistant } from "..";
 import { pollCreateModal } from "../utils/modals";
@@ -51,7 +50,7 @@ export default {
     const subcommand = interaction.options.getSubcommand(true);
 
     if (subcommand === "create") {
-      showModal(pollCreateModal(), { client: lunarAssistant.client, interaction: interaction })
+      interaction.showModal(pollCreateModal());
     }
     if (subcommand === "list") {
       const status = interaction.options.getString("status") ?? "all";

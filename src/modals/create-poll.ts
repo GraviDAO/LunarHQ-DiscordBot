@@ -1,9 +1,8 @@
-import { ModalSubmitInteraction } from "discord-modals";
 import { LunarAssistant } from "..";
 import { GuildPolls, Poll } from "../shared/firestoreTypes";
 import { pollEmbed, primaryEmbed } from "../utils/embeds";
 import db from "../services/admin";
-import { Message, TextChannel } from "discord.js";
+import { Message, ModalSubmitInteraction, TextChannel } from "discord.js";
 import { castPollVoteButtons } from "../utils/buttons";
 import { timeToTimestamp } from "../utils/timeToTimestamp";
 import { archivePoll } from "../utils/archivePoll";
@@ -16,7 +15,7 @@ export default {
   ) => {
     await interaction.deferReply({ ephemeral: true });
 
-    const nftAddress = interaction.getTextInputValue("nftAddress");
+    const nftAddress = interaction.fields.getTextInputValue("nftAddress");
 
     if (nftAddress.length != 44 || !nftAddress.startsWith("terra", 0)) {
       await interaction.followUp({
@@ -25,7 +24,9 @@ export default {
       return;
     }
 
-    const quorum = parseFloat(interaction.getTextInputValue("quorum") ?? 0);
+    const quorum = parseFloat(
+      interaction.fields.getTextInputValue("quorum") ?? 0
+    );
     if (quorum < 0 || quorum > 100) {
       await interaction.followUp({
         content: "Invalid quorum value",
@@ -45,8 +46,8 @@ export default {
       : { polls: [] };
 
     const data: Poll = {
-      title: interaction.getTextInputValue("title"),
-      description: interaction.getTextInputValue("description"),
+      title: interaction.fields.getTextInputValue("title"),
+      description: interaction.fields.getTextInputValue("description"),
       creator: interaction.user.id,
       uuid: (
         ((guildPolls.polls?.length ?? 0) !== 0
@@ -57,7 +58,9 @@ export default {
         .padStart(3, "0"),
       active: true,
       quorum: quorum,
-      endsAt: timeToTimestamp(interaction.getTextInputValue("time") ?? "14d"),
+      endsAt: timeToTimestamp(
+        interaction.fields.getTextInputValue("time") ?? "14d"
+      ),
       votes: {
         yes: [],
         no: [],
