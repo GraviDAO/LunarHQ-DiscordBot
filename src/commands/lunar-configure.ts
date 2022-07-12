@@ -132,15 +132,15 @@ export default {
     )
     .addSubcommand((subcommand) =>
       subcommand
-        .setName("add-cw20-rule")
+        .setName("add-token-rule")
         .setDescription(
-          "Adds a rule for granting a role to users based on cw20 ownership."
+          "Adds a rule for granting a role to users based on token ownership."
         )
         .addStringOption((option) =>
           option
-            .setName("cw20-address")
+            .setName("token-address")
             .setDescription(
-              "The contract address against which to check for cw20 ownership for this rule."
+              "The contract address against which to check for token ownership for this rule."
             )
             .setRequired(true)
         )
@@ -172,7 +172,7 @@ export default {
           option
             .setName("quantity")
             .setDescription(
-              "The quantity of matching cw20 tokens that a user must hold in order to meet the rule."
+              "The quantity of matching token tokens that a user must hold in order to meet the rule."
             )
         )
     )
@@ -249,7 +249,7 @@ export default {
     let role;
     let rawQuantity;
     let rawTokenIds;
-    let cw20Address;
+    let tokenAddress;
     let apiUrl;
     let ruleNumber;
     let tokenIds;
@@ -410,16 +410,16 @@ export default {
         });
         break;
 
-      case "add-cw20-rule":
+      case "add-token-rule":
         // configure the server settings
-        cw20Address = interaction.options
-          .getString("cw20-address", true)
+        tokenAddress = interaction.options
+          .getString("token-address", true)
           .toLowerCase();
         blockchainName = interaction.options.getString("blockchain", true);
         role = interaction.options.getRole("role", true);
         rawQuantity = interaction.options.getNumber("quantity") ?? 1;
 
-        if (!isValidTerraAddress(cw20Address)) {
+        if (!isValidTerraAddress(tokenAddress)) {
           await interaction.editReply({
             content: "Invalid terra address",
           });
@@ -434,8 +434,8 @@ export default {
           return;
         }
 
-        const addCw20RuleData: tokenRuleData = {
-          tokenAddress: cw20Address,
+        const addtokenRuleData: tokenRuleData = {
+          tokenAddress: tokenAddress,
           blockchainName: blockchainName,
           quantity: rawQuantity,
           role: role.id,
@@ -443,7 +443,7 @@ export default {
         };
 
         try {
-          await api.addTokenRule(addCw20RuleData);
+          await api.addTokenRule(addtokenRuleData);
         } catch (e) {
           console.error(e);
           await interaction.editReply({
