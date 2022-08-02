@@ -1,11 +1,10 @@
 {
-"token": "",
-"clientId": "",
-"environment": "",
-"run_sync_processes": false,
-"handle_interactions": true,
-"mock_mode": false,
-"LCDCClient_URL": "",
-"DISCORD_VERIFICATION_SECRET": "",
-"FIREBASE_ADMIN_SERVICE_ACCOUNT": {}
+  "token": "",
+  "clientId": "",
+  "environment": "production",
+  "handle_interactions": true,
+  "lunarHQ_url": "",
+  "botName": "LunarHQ",
+  "DISCORD_VERIFICATION_SECRET": "",
+  "API_SECRET": ""
 }

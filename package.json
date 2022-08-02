@@ -1,5 +1,5 @@
 {
-  "name": "lunar-assist-bot",
+  "name": "LunarHQ-DiscordBot",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
@@ -14,16 +14,12 @@
   "dependencies": {
     "@discordjs/builders": "^0.13.0",
     "@discordjs/rest": "0.1.0-canary.0",
-    "@terra-money/terra.js": "^2.0.14",
     "@types/jsonwebtoken": "^8.5.5",
-    "@types/node-cron": "^3.0.0",
     "axios": "^0.21.4",
     "commander": "^8.3.0",
     "discord-api-types": "^0.36.1",
     "discord.js": "^14.1.2",
-    "firebase-admin": "^11.0.0",
     "jsonwebtoken": "^8.5.1",
-    "node-cron": "^3.0.0",
     "winston": "^3.6.0",
     "winston-daily-rotate-file": "^4.6.1",
     "ws": "^7.5.5"

@@ -1,39 +1,19 @@
 import { Client, Guild, IntentsBitField } from "discord.js";
-import { handle_interactions, run_sync_processes, token } from "../config.json";
-import db from "./services/admin";
-import { coldUpdateDiscordRolesForUser } from "./utils/coldUpdateDiscordRolesForUser";
-import { connectObserver } from "./utils/connectObserver";
-import { handleNewBlock } from "./utils/handleNewBlock";
-import { handleNFTMoveEvent } from "./utils/handleNFTMoveEvent";
+import { handle_interactions, token } from "../config.json";
 import { interactionHandler } from "./utils/interactionHandler";
 import { registerCommands } from "./utils/registerCommands";
-import { runSyncProcesses } from "./utils/runSyncProcesses";
-import { updateAllDiscordUserRoles } from "./utils/updateAllDiscordUserRoles";
-import { updateDiscordRolesForUser } from "./utils/updateDiscordRolesForUser";
 import { setupPollTimeout } from "./utils/setupPollTimeout";
-import { GuildPolls, Poll } from "./shared/firestoreTypes";
 import { api } from "./services/api";
 
 export class LunarAssistant {
   client: Client;
-  db: FirebaseFirestore.Firestore;
 
   // define functions
-  public updateDiscordRolesForUser = updateDiscordRolesForUser;
-  public coldUpdateDiscordRolesForUser = coldUpdateDiscordRolesForUser;
-  public updateAllDiscordUserRoles = updateAllDiscordUserRoles;
-  public handleNFTMoveEvent = handleNFTMoveEvent;
-  public handleNewBlock = handleNewBlock;
-  public connectObserver = connectObserver;
   public interactionHandler = interactionHandler;
-  public runSyncProcesses = runSyncProcesses;
 
   constructor() {
     // Create a new client instance
     this.client = new Client({ intents: [IntentsBitField.Flags.Guilds] });
-
-    // save the db instance
-    this.db = db;
   }
 
   async registerGuildCommands() {
@@ -77,7 +57,6 @@ export class LunarAssistant {
 
   start(
     onReady: (lunarAssistantBot: LunarAssistant) => void,
-    runSyncProcesses: boolean,
     handleInteractions: boolean
   ) {
     // Setup listeners
@@ -89,10 +68,6 @@ export class LunarAssistant {
 
       // this.startPollTimeouts();
 
-      // only add listeners when not in maintenance mode
-      if (runSyncProcesses) {
-        this.runSyncProcesses();
-      }
       // Call the passed onReady function
       onReady(this);
     });
@@ -125,6 +100,5 @@ lunarAssistantBot.start(
   () => {
     console.log("Ready!");
   },
-  run_sync_processes,
   handle_interactions
 );

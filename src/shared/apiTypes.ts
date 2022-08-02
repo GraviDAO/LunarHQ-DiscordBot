@@ -129,3 +129,29 @@ export interface AccountWallet {
 export interface GetUsersWalletsResponse {
   accountWallets: AccountWallet[];
 }
+
+export interface PollResults {
+  yes: number;
+  no: number;
+  abstain: number;
+  total: number;
+}
+
+export interface Poll {
+  title: string;
+  description: string;
+  uuid: string;
+  creator: string;
+  active: boolean;
+  quorum: number;
+  endsAt: number;
+  votes: {
+    yes: string[];
+    no: string[];
+    abstain: string[];
+  }
+  results?: PollResults | null,
+  contractAddress: string;
+  messageId?: string;
+  channelId?: string;
+}

@@ -1,6 +1,5 @@
 import { Colors, EmbedBuilder, Formatters, User } from "discord.js";
-import { CreateProposal, Proposal, ProposalChoice } from "../shared/apiTypes";
-import { Poll } from "../shared/firestoreTypes";
+import { CreateProposal, Proposal, ProposalChoice, Poll } from "../shared/apiTypes";
 
 export function primaryEmbed(
   title: string | undefined = undefined,
