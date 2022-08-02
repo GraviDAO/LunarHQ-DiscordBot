@@ -1,5 +1,13 @@
-import { ContextMenuCommandBuilder, SlashCommandBuilder } from "@discordjs/builders";
-import { ButtonInteraction, CommandInteraction, ContextMenuInteraction, ModalSubmitInteraction } from "discord.js";
+import {
+  ContextMenuCommandBuilder,
+  SlashCommandBuilder,
+} from "@discordjs/builders";
+import {
+  ButtonInteraction,
+  CommandInteraction,
+  ContextMenuCommandInteraction,
+  ModalSubmitInteraction,
+} from "discord.js";
 import { LunarAssistant } from "..";
 
 export interface SlashCommandData {
@@ -11,11 +19,11 @@ export interface SlashCommandData {
 }
 
 export interface ContextMenuData {
-  data: ContextMenuCommandBuilder,
+  data: ContextMenuCommandBuilder;
   execute: (
     lunarAssistant: LunarAssistant,
-    interaction: ContextMenuInteraction
-    ) => Promise<void>;
+    interaction: ContextMenuCommandInteraction
+  ) => Promise<void>;
 }
 
 export interface ButtonData {
@@ -23,7 +31,7 @@ export interface ButtonData {
   execute: (
     lunarAssistant: LunarAssistant,
     interaction: ButtonInteraction
-    ) => Promise<void>;
+  ) => Promise<void>;
 }
 
 export interface ModalData {

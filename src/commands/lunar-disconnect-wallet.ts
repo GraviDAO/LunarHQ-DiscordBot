@@ -1,8 +1,8 @@
 import { SlashCommandBuilder } from "@discordjs/builders";
-import { CommandInteraction } from "discord.js";
-import firebase from "firebase-admin";
+import { ChatInputCommandInteraction } from "discord.js";
 import { LunarAssistant } from "..";
-import db from "../services/admin";
+import { api } from "../services/api";
+import { AccountWallet } from "../shared/apiTypes";
 
 export default {
   data: new SlashCommandBuilder()
@@ -10,33 +10,39 @@ export default {
     .setDescription("Disconnect the wallet linked to your discord account."),
   execute: async (
     lunarAssistant: LunarAssistant,
-    interaction: CommandInteraction
+    interaction: ChatInputCommandInteraction
   ) => {
-    const userRef = db.collection("users").doc(interaction.user.id);
-    const statsRef = db.collection("root").doc("stats");
-    // get the user document
-    const userDoc = await userRef.get();
+    await interaction.deferReply({ ephemeral: true });
 
-    if (userDoc.exists) {
-      const batch = db.batch();
-      const increment = firebase.firestore.FieldValue.increment(-1);
-
-      // delete the users document
-      batch.delete(userRef);
-      batch.set(statsRef, { userCount: increment }, { merge: true });
-
-      await batch.commit();
-
-      await interaction.reply({
-        content: "Your wallet has been disconnected successfully",
-        ephemeral: true,
+    let wallets: AccountWallet[];
+    try {
+      wallets = (await api.getUsersWallets(interaction.user.id)).accountWallets;
+    } catch (e) {
+      await interaction.editReply({
+        content: "Error getting your wallets, please try again later.",
       });
-    } else {
-      await interaction.reply({
+      return;
+    }
+
+    if (wallets.length === 0) {
+      await interaction.editReply({
         content:
           "You haven't linked a wallet yet, so there is no wallet to disconnect.",
-        ephemeral: true,
       });
+      return;
+    }
+
+    try {
+      await api.unlinkWallet(interaction.user.id);
+      await interaction.editReply({
+        content: "Your wallet has been disconnected.",
+      });
+    } catch (error) {
+      console.log(error);
+      await interaction.editReply({
+        content: "Error disconnecting your wallet, please try again later.",
+      });
+      return;
     }
   },
 };

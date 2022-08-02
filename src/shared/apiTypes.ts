@@ -68,3 +68,64 @@ export interface apiRuleData {
   discordServerId: string;
   blockchainName: string;
 }
+
+export interface CreateProposal {
+  title: string;
+  description: string;
+  address: string;
+  votingSystem: string;
+  creatorDiscordId: string;
+  quorum: string;
+  duration: string;
+  discordServerId: string;
+  discordMessageId: string;
+  discordChannelId: string;
+  blockchainName: string;
+}
+
+export interface Proposal {
+  id: number;
+  title: string;
+  description: string;
+  address: string;
+  votingSystem: string;
+  creatorDiscordId: string;
+  quorum: string;
+  startDate: Date;
+  endDate: Date;
+  discordMessageId: string;
+  discordChannelId: string;
+  discordServerId: string;
+  blockchainName: string;
+  status: string;
+}
+
+export interface GetProposalsResponse {
+  proposals: Proposal[];
+}
+
+export interface ProposalChoice {
+  choice: string;
+  votes: number;
+}
+
+export interface GetProposalResultsResponse {
+  proposal: Proposal;
+  choices: ProposalChoice[];
+}
+
+export enum ProposalStatus {
+  Pending = "Pending",
+  Active = "Active",
+  Closed = "Closed",
+}
+
+export interface AccountWallet {
+  id: number;
+  address: string;
+  blockchainName: string;
+}
+
+export interface GetUsersWalletsResponse {
+  accountWallets: AccountWallet[];
+}

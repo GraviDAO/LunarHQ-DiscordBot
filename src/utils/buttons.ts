@@ -1,47 +1,68 @@
-import { MessageActionRow, MessageButton } from "discord.js";
+import {
+  ActionRowBuilder,
+  ButtonBuilder,
+  ButtonStyle,
+  SelectMenuBuilder,
+} from "discord.js";
 
-export function castPollVoteButtons(enabled: boolean = true) {
-    return new MessageActionRow({
-        components: [
-            new MessageButton({
-                customId: "pollVote.yes",
-                label: "Yes",
-                style: "SUCCESS",
-                disabled: !enabled
-            }),
-            new MessageButton({
-                customId: "pollVote.no",
-                label: "No",
-                style: "DANGER",
-                disabled: !enabled
-            }),
-            new MessageButton({
-                customId: "pollVote.abstain",
-                label: "Abstain",
-                style: "PRIMARY",
-                disabled: !enabled
-            }),
-            new MessageButton({
-                customId: "pollVote.clear",
-                label: "Reset",
-                style: "SECONDARY",
-                disabled: !enabled
-            })
-        ]
-    })
+export function castProposalVoteButtons(enabled: boolean = true) {
+  return new ActionRowBuilder<ButtonBuilder>({
+    components: [
+      new ButtonBuilder({
+        customId: "pollVote.yes",
+        label: "Yes",
+        style: ButtonStyle.Success,
+        disabled: !enabled,
+      }),
+      new ButtonBuilder({
+        customId: "pollVote.no",
+        label: "No",
+        style: ButtonStyle.Danger,
+        disabled: !enabled,
+      }),
+      new ButtonBuilder({
+        customId: "pollVote.abstain",
+        label: "Abstain",
+        style: ButtonStyle.Primary,
+        disabled: !enabled,
+      }),
+      new ButtonBuilder({
+        customId: "pollVote.clear",
+        label: "Reset",
+        style: ButtonStyle.Secondary,
+        disabled: !enabled,
+      }),
+    ],
+  });
 }
 
-export function confirmButtons (needle: string) {
-	return new MessageActionRow({ components: [
-		new MessageButton({
-			customId: `${needle}Confirm`,
-			label: 'Confirm',
-			style: 'SUCCESS',
-		}),
-		new MessageButton({
-			customId: `${needle}Cancel`,
-			label: 'Cancel',
-			style: 'DANGER',
-		}),
-	] });
+export function confirmButtons(needle: string) {
+  return new ActionRowBuilder<ButtonBuilder>({
+    components: [
+      new ButtonBuilder({
+        customId: `${needle}Confirm`,
+        label: "Confirm",
+        style: ButtonStyle.Success,
+      }),
+      new ButtonBuilder({
+        customId: `${needle}Cancel`,
+        label: "Cancel",
+        style: ButtonStyle.Danger,
+      }),
+    ],
+  });
+}
+
+export function blockchainNameChoices() {
+  return new ActionRowBuilder<SelectMenuBuilder>({
+    components: [
+      new SelectMenuBuilder({
+        customId: "blockchainPicker",
+        options: [
+          { label: "Terra", value: "Terra" },
+          { label: "Terra Classic", value: "Terra Classic" },
+        ],
+      }),
+    ],
+  });
 }

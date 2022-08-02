@@ -1,65 +1,78 @@
 import { ContextMenuCommandBuilder } from "@discordjs/builders";
-import { Message, MessageContextMenuInteraction } from "discord.js";
+import { Message, MessageContextMenuCommandInteraction } from "discord.js";
 import { LunarAssistant } from "..";
-import db from "../services/admin";
-import { GuildPolls, Poll } from "../shared/firestoreTypes";
-import { castPollVoteButtons } from "../utils/buttons";
-import {primaryEmbed} from "../utils/embeds";
+import { api } from "../services/api";
+import { castProposalVoteButtons } from "../utils/buttons";
+import { primaryEmbed } from "../utils/embeds";
 
 export default {
-    data: new ContextMenuCommandBuilder()
-      .setName("Close Poll")
-      .setDefaultPermission(false)
-      .setType(3),
-    execute: async (
-      lunarAssistant: LunarAssistant,
-      interaction: MessageContextMenuInteraction
-    ) => {
-      const message = interaction.targetMessage;
+  data: new ContextMenuCommandBuilder()
+    .setName("Close Poll")
+    .setDefaultPermission(false)
+    .setType(3),
+  execute: async (
+    lunarAssistant: LunarAssistant,
+    interaction: MessageContextMenuCommandInteraction
+  ) => {
+    const message = interaction.targetMessage;
 
-      if (message.author.id !== lunarAssistant.client.user?.id) {
-          await interaction.reply({ embeds: [ primaryEmbed(undefined, "Invalid poll message.") ], ephemeral: true })
-          return;
-      }
+    if (message.author.id !== lunarAssistant.client.user?.id) {
+      await interaction.reply({
+        embeds: [primaryEmbed(undefined, "Invalid proposal message.")],
+        ephemeral: true,
+      });
+      return;
+    }
 
-      const guildPollsDoc = await db
-        .collection("guildPolls")
-        .doc(interaction.guildId!)
-        .get()
-      
-      const guildPolls: GuildPolls = guildPollsDoc.exists
-      ? (guildPollsDoc.data() as GuildPolls)
-      : { polls: [] };
+    let proposals;
+    try {
+      proposals = await api.getProposals(interaction.guildId!);
+    } catch (error) {
+      console.log(error);
+      await interaction.reply({
+        embeds: [primaryEmbed(undefined, "Could not get proposals.")],
+        ephemeral: true,
+      });
+      return;
+    }
 
-      const poll = guildPolls.polls.find((p: Poll) => p.messageId === message.id );
-      
-      if (!poll) {
-          await interaction.reply({ embeds: [ primaryEmbed(undefined, "Invalid poll message.") ], ephemeral: true })
-          return;
-      }
+    const proposal = proposals.proposals.find(
+      (v) => v.discordMessageId === message.id
+    );
 
-      if (!poll.active) {
-        await interaction.reply({ embeds: [ primaryEmbed(undefined, "This poll is already closed.") ], ephemeral: true })
-        return;
-      }
+    if (!proposal) {
+      await interaction.reply({
+        embeds: [primaryEmbed(undefined, "Invalid proposal message.")],
+        ephemeral: true,
+      });
+      return;
+    }
 
-      poll.active = false;
+    try {
+      await api.closeProposal(interaction.guildId!, proposal.id.toString());
+    } catch (error) {
+      console.log(error);
+      await interaction.reply({
+        embeds: [primaryEmbed(undefined, "Could not close proposal.")],
+        ephemeral: true,
+      });
+      return;
+    } finally {
       if (message instanceof Message) {
-        await message.edit({ components: [ castPollVoteButtons(false) ] });
+        await message.edit({ components: [castProposalVoteButtons(false)] });
         if (message.thread && !message.thread.archived) {
           try {
             await message.thread.setArchived(true, "Poll Closed");
           } catch (error) {
-            console.log(`Could not archive thread: ${message.thread.name}`)
+            console.log(`Could not archive thread: ${message.thread.name}`);
           }
         }
       }
 
-      await db
-        .collection("guildPolls")
-        .doc(interaction.guildId!)
-        .set(guildPolls);
-      
-      await interaction.reply({ embeds: [ primaryEmbed(undefined, "Closed the poll to votes.") ], ephemeral: true })
+      await interaction.reply({
+        embeds: [primaryEmbed(undefined, "Closed the poll to votes.")],
+        ephemeral: true,
+      });
     }
-}
+  },
+};

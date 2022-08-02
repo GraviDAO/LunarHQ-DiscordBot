@@ -3,8 +3,13 @@ import { lunarHQ_url, API_SECRET } from "../../config.json";
 import jwt from "jsonwebtoken";
 import {
   apiRuleData,
+  CreateProposal,
+  GetProposalResultsResponse,
+  GetProposalsResponse,
   GetRulesResponse,
+  GetUsersWalletsResponse,
   nftRuleData,
+  Proposal,
   stakedNftRuleData,
   tokenRuleData,
 } from "../shared/apiTypes";
@@ -23,12 +28,15 @@ class API {
     this.apiToken = params?.token ?? this.apiToken;
   }
 
-  private sign(guildId: string, accessTypes: string[]) {
-    return jwt.sign(
-      { discordServerId: guildId, accessTypes: accessTypes },
-      this.apiToken,
-      { expiresIn: "15m" }
-    );
+  async getNftRules(guildId: string): Promise<GetRulesResponse> {
+    return (
+      await this.get(
+        "getRules",
+        this.config(this.sign(guildId, ["getRules"]), {
+          discordServerId: guildId,
+        })
+      )
+    ).data.message;
   }
 
   async deleteRule(guildId: string, ruleId: string): Promise<AxiosResponse> {
@@ -40,17 +48,6 @@ class API {
         })
       )
     ).data;
-  }
-
-  async getNftRules(guildId: string): Promise<GetRulesResponse> {
-    return (
-      await this.get(
-        "getRules",
-        this.config(this.sign(guildId, ["getRules"]), {
-          discordServerId: guildId,
-        })
-      )
-    ).data.message;
   }
 
   async addNftRule(data: nftRuleData): Promise<AxiosResponse> {
@@ -91,6 +88,138 @@ class API {
         data
       )
     ).data;
+  }
+
+  async createProposal(data: CreateProposal): Promise<Proposal> {
+    return (
+      await this.post(
+        "createProposal",
+        this.config(this.sign(data.discordServerId, ["createProposal"])),
+        data
+      )
+    ).data.message;
+  }
+
+  async deleteProposal(
+    guildId: string,
+    proposalId: string
+  ): Promise<AxiosResponse> {
+    return (
+      await this.delete(
+        `deleteProposal/${proposalId}`,
+        this.config(this.sign(guildId, ["deleteProposal"]), {
+          discordServerId: guildId,
+        })
+      )
+    ).data;
+  }
+
+  async getProposals(guildId: string): Promise<GetProposalsResponse> {
+    return (
+      await this.get(
+        "getProposals",
+        this.config(this.sign(guildId, ["getProposals"]), {
+          discordServerId: guildId,
+        })
+      )
+    ).data.message;
+  }
+
+  async openProposal(
+    guildId: string,
+    proposalId: string
+  ): Promise<AxiosResponse> {
+    return (
+      await this.put(
+        `openProposal/${proposalId}`,
+        this.config(this.sign(guildId, ["openProposal"])),
+        {
+          discordServerId: guildId,
+          proposalId: proposalId,
+        }
+      )
+    ).data;
+  }
+
+  async closeProposal(
+    guildId: string,
+    proposalId: string
+  ): Promise<GetProposalsResponse> {
+    return (
+      await this.put(
+        `closeProposal/${proposalId}`,
+        this.config(this.sign(guildId, ["closeProposal"])),
+        {
+          discordServerId: guildId,
+          proposalId: proposalId,
+        }
+      )
+    ).data.message;
+  }
+
+  async getProposalResults(
+    guildId: string,
+    proposalId: string
+  ): Promise<GetProposalResultsResponse> {
+    return (
+      await this.get(
+        "getProposalResults",
+        this.config(this.sign(guildId, ["getProposalResults"]), {
+          discordServerId: guildId,
+          proposalId: proposalId,
+        })
+      )
+    ).data.message;
+  }
+
+  async castVote(
+    guildId: string,
+    vote: string,
+    userId: string,
+    messageId: string
+  ) {
+    return (
+      await this.post(
+        "castVote",
+        this.config(this.sign(guildId, ["castVote"])),
+        {
+          discordUserId: userId,
+          discordMessageId: messageId,
+          vote: vote,
+        }
+      )
+    ).data;
+  }
+
+  async getUsersWallets(userId: string): Promise<GetUsersWalletsResponse> {
+    return (
+      await this.get(
+        "getUsersWallets",
+        this.config(this.sign(undefined, ["getUsersWallets"]), {
+          discordUserId: userId,
+        })
+      )
+    ).data.message;
+  }
+
+  async unlinkWallet(userId: string) {
+    return (
+      await this.put(
+        "unlinkWallet",
+        this.config(this.sign(undefined, ["unlinkWallet"])),
+        {
+          discordUserId: userId,
+        }
+      )
+    ).data;
+  }
+
+  private sign(guildId: string | undefined, accessTypes: string[]) {
+    return jwt.sign(
+      { discordServerId: guildId, accessTypes: accessTypes },
+      this.apiToken,
+      { expiresIn: "15m" }
+    );
   }
 
   private config(token: string, params?: any): AxiosRequestConfig {
@@ -148,6 +277,27 @@ class API {
     return new Promise((resolve, reject) => {
       axios
         .delete(this.apiBaseUrl + url, config)
+        .then((response) => {
+          if (response.status === 200) {
+            resolve(response);
+          } else {
+            reject(response);
+          }
+        })
+        .catch((error) => {
+          reject(error);
+        });
+    });
+  }
+
+  private put(
+    url: string,
+    config: AxiosRequestConfig,
+    data: any
+  ): Promise<AxiosResponse> {
+    return new Promise((resolve, reject) => {
+      axios
+        .put(this.apiBaseUrl + url, data, config)
         .then((response) => {
           if (response.status === 200) {
             resolve(response);

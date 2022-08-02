@@ -1,4 +1,4 @@
-import { Client, Guild, Intents } from "discord.js";
+import { Client, Guild, IntentsBitField } from "discord.js";
 import { handle_interactions, run_sync_processes, token } from "../config.json";
 import db from "./services/admin";
 import { coldUpdateDiscordRolesForUser } from "./utils/coldUpdateDiscordRolesForUser";
@@ -30,7 +30,7 @@ export class LunarAssistant {
 
   constructor() {
     // Create a new client instance
-    this.client = new Client({ intents: [Intents.FLAGS.GUILDS] });
+    this.client = new Client({ intents: [IntentsBitField.Flags.Guilds] });
 
     // save the db instance
     this.db = db;
@@ -46,34 +46,34 @@ export class LunarAssistant {
     }
   }
 
-  async startPollTimeouts() {
-    const guildPolls = await db.collection("guildPolls").get();
+  // async startPollTimeouts() {
+  //   const guildPolls = await db.collection("guildPolls").get();
 
-    for (const guildPoll of guildPolls.docs) {
-      let guild: Guild;
-      const polls = ((guildPoll.data() as GuildPolls).polls ?? []).filter(
-        (p: Poll) => p.active
-      );
-      try {
-        guild =
-          this.client.guilds.cache.get(guildPoll.id) ??
-          (await this.client.guilds.fetch(guildPoll.id));
-        if (!guild) continue;
-      } catch (e) {
-        continue;
-      }
-      try {
-        await setupPollTimeout(this, guild, polls);
-      } catch (e) {
-        console.error(
-          `Couldn't create poll timeouts commands for ${guild.name}`
-        );
-        console.error(e);
-      }
+  //   for (const guildPoll of guildPolls.docs) {
+  //     let guild: Guild;
+  //     const polls = ((guildPoll.data() as GuildPolls).polls ?? []).filter(
+  //       (p: Poll) => p.active
+  //     );
+  //     try {
+  //       guild =
+  //         this.client.guilds.cache.get(guildPoll.id) ??
+  //         (await this.client.guilds.fetch(guildPoll.id));
+  //       if (!guild) continue;
+  //     } catch (e) {
+  //       continue;
+  //     }
+  //     try {
+  //       await setupPollTimeout(this, guild, polls);
+  //     } catch (e) {
+  //       console.error(
+  //         `Couldn't create poll timeouts commands for ${guild.name}`
+  //       );
+  //       console.error(e);
+  //     }
 
-      await new Promise((r) => setTimeout(r, 1000));
-    }
-  }
+  //     await new Promise((r) => setTimeout(r, 1000));
+  //   }
+  // }
 
   start(
     onReady: (lunarAssistantBot: LunarAssistant) => void,
@@ -83,11 +83,11 @@ export class LunarAssistant {
     // Setup listeners
 
     // When the client is ready, run this code (only once)
-    this.client.once("ready", () => {
+    this.client.once("ready", async () => {
       // Reregister guild commands for all servers
       this.registerGuildCommands();
 
-      this.startPollTimeouts();
+      // this.startPollTimeouts();
 
       // only add listeners when not in maintenance mode
       if (runSyncProcesses) {

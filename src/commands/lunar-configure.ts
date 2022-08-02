@@ -1,5 +1,9 @@
 import { SlashCommandBuilder } from "@discordjs/builders";
-import { CommandInteraction, MessageAttachment } from "discord.js";
+import {
+  Attachment,
+  AttachmentBuilder,
+  ChatInputCommandInteraction,
+} from "discord.js";
 import { LunarAssistant } from "..";
 import {
   apiRuleData,
@@ -235,7 +239,7 @@ export default {
     ),
   execute: async (
     lunarAssistant: LunarAssistant,
-    interaction: CommandInteraction
+    interaction: ChatInputCommandInteraction
   ) => {
     // verify the interaction is valid
     if (!interaction.guildId || !interaction.guild || !interaction.member)
@@ -294,7 +298,9 @@ export default {
         }
 
         // check if the bot role is above the verified role
-        if (role.position > interaction.guild.me!.roles.highest.position) {
+        if (
+          role.position > interaction.guild.members.me!.roles.highest.position
+        ) {
           await interaction.editReply({
             content: `Please update the role hierarchy with my highest role above of ${role.name} and try again.`,
           });
@@ -376,7 +382,9 @@ export default {
         }
 
         // check if the bot role is above the verified role
-        if (role.position > interaction.guild.me!.roles.highest.position) {
+        if (
+          role.position > interaction.guild.members.me!.roles.highest.position
+        ) {
           await interaction.editReply({
             content: `Please update the role hierarchy with my highest role above of ${role.name} and try again.`,
           });
@@ -427,7 +435,9 @@ export default {
         }
 
         // Check if the bot role is above the verified role
-        if (role.position > interaction.guild.me!.roles.highest.position) {
+        if (
+          role.position > interaction.guild.members.me!.roles.highest.position
+        ) {
           await interaction.editReply({
             content: `Please update the role hierarchy with my highest role above of ${role.name} and try again.`,
           });
@@ -474,7 +484,9 @@ export default {
         }
 
         // check if the bot role is above the verified role
-        if (role.position > interaction.guild.me!.roles.highest.position) {
+        if (
+          role.position > interaction.guild.members.me!.roles.highest.position
+        ) {
           await interaction.editReply({
             content: `Please update the role hierarchy with my highest role above of ${role.name} and try again.`,
           });
@@ -546,10 +558,9 @@ export default {
         await interaction.editReply({
           content: "Your configured rules are attached!",
           files: [
-            new MessageAttachment(
-              Buffer.from(JSON.stringify(res, null, 4)),
-              `lunar-assistant-rules.txt`
-            ),
+            new AttachmentBuilder(Buffer.from(JSON.stringify(res, null, 4)), {
+              name: `lunar-assistant-rules.txt`,
+            }),
           ],
         });
         break;

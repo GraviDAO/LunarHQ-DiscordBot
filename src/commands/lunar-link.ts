@@ -1,5 +1,5 @@
 import { SlashCommandBuilder } from "@discordjs/builders";
-import { CommandInteraction } from "discord.js";
+import { ChatInputCommandInteraction } from "discord.js";
 import jwt from "jsonwebtoken";
 import { LunarAssistant } from "..";
 import { DISCORD_VERIFICATION_SECRET, environment } from "../../config.json";
@@ -10,7 +10,7 @@ export default {
     .setDescription("Links a wallet to your discord account."),
   execute: async (
     lunarAssistant: LunarAssistant,
-    interaction: CommandInteraction
+    interaction: ChatInputCommandInteraction
   ) => {
     // verify the interaction is valid
 

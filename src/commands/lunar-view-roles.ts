@@ -1,5 +1,10 @@
 import { SlashCommandBuilder } from "@discordjs/builders";
-import { CommandInteraction, MessageAttachment } from "discord.js";
+import {
+  Attachment,
+  AttachmentBuilder,
+  ChatInputCommandInteraction,
+  CommandInteraction,
+} from "discord.js";
 import { LunarAssistant } from "..";
 import { User } from "../shared/firestoreTypes";
 import { APICallError, UserDocMissingError } from "../types/errors";
@@ -27,7 +32,7 @@ const lunarVerify = {
     ),
   execute: async (
     lunarAssistant: LunarAssistant,
-    interaction: CommandInteraction
+    interaction: ChatInputCommandInteraction
   ) => {
     // verify the interaction is valid
     if (!interaction.guildId || !interaction.guild || !interaction.member)
@@ -96,7 +101,9 @@ const lunarVerify = {
             content:
               "Hello ser! Your granted roles are attached. They are sent as a file instead of a message because you have so many roles that they can't fit into a single message, congrats!\n\nBuilt by GraviDAO",
             files: [
-              new MessageAttachment(Buffer.from(message), `your-roles.txt`),
+              new AttachmentBuilder(Buffer.from(message), {
+                name: `your-roles.txt`,
+              }),
             ],
           });
         } else {

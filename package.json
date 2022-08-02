@@ -20,7 +20,7 @@
     "axios": "^0.21.4",
     "commander": "^8.3.0",
     "discord-api-types": "^0.36.1",
-    "discord.js": "^13.8.1",
+    "discord.js": "^14.1.2",
     "firebase-admin": "^11.0.0",
     "jsonwebtoken": "^8.5.1",
     "node-cron": "^3.0.0",

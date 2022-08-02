@@ -1,4 +1,9 @@
-import { Collection, Interaction } from "discord.js";
+import {
+  Collection,
+  Interaction,
+  InteractionType,
+  ModalSubmitInteraction,
+} from "discord.js";
 import path from "path";
 import { LunarAssistant } from "..";
 import {
@@ -69,16 +74,13 @@ export async function interactionHandler(
   interaction: Interaction
 ) {
   if (
-    !(
-      interaction.isCommand() ||
-      interaction.isButton() ||
-      interaction.isMessageContextMenu() ||
-      interaction.isModalSubmit()
+    ![InteractionType.ApplicationCommand, InteractionType.ModalSubmit].includes(
+      interaction.type
     )
   )
     return;
 
-  if (interaction.isCommand()) {
+  if (interaction.isChatInputCommand()) {
     // get the command handler
     const command = commandHandlers.get(interaction.commandName);
 
@@ -122,7 +124,7 @@ export async function interactionHandler(
       });
     }
   }
-  if (interaction.isMessageContextMenu()) {
+  if (interaction.isMessageContextMenuCommand()) {
     // get the button handler
     const contextMenu = contextMenusHandlers.get(interaction.commandName);
 
@@ -144,7 +146,7 @@ export async function interactionHandler(
       });
     }
   }
-  if (interaction.isModalSubmit()) {
+  if (interaction instanceof ModalSubmitInteraction) {
     // get the modal handler
     const modal = modalHandlers.get(interaction.customId.split(".")[0]);
 

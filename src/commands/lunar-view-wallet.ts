@@ -1,8 +1,8 @@
 import { SlashCommandBuilder } from "@discordjs/builders";
-import { CommandInteraction } from "discord.js";
+import { ChatInputCommandInteraction } from "discord.js";
 import { LunarAssistant } from "..";
-import db from "../services/admin";
-import { User } from "../shared/firestoreTypes";
+import { api } from "../services/api";
+import { AccountWallet } from "../shared/apiTypes";
 
 export default {
   data: new SlashCommandBuilder()
@@ -10,25 +10,32 @@ export default {
     .setDescription("View the wallet linked to your discord account."),
   execute: async (
     lunarAssistant: LunarAssistant,
-    interaction: CommandInteraction
+    interaction: ChatInputCommandInteraction
   ) => {
-    // get the user document
-    const userDoc = await db.collection("users").doc(interaction.user.id).get();
+    await interaction.deferReply({ ephemeral: true });
 
-    if (userDoc.exists) {
-      const wallet = (userDoc.data() as User).wallet;
-      const finderBaseAddress = "https://finder.terra.money/columbus-5/address";
-
-      await interaction.reply({
-        content: "Your registered wallet: " + wallet,
-        ephemeral: true,
+    let wallets: AccountWallet[];
+    try {
+      wallets = (await api.getUsersWallets(interaction.user.id)).accountWallets;
+    } catch (e) {
+      await interaction.editReply({
+        content: "Error getting your wallets, please try again later.",
       });
-    } else {
-      await interaction.reply({
-        content:
-          "You haven't linked any wallets yet. Link a wallet with /lunar-link",
-        ephemeral: true,
-      });
+      return;
     }
+
+    if (wallets.length === 0) {
+      await interaction.editReply({
+        content:
+          "You haven't linked any wallets yet. Link a wallet with `/lunar-link`.",
+      });
+      return;
+    }
+
+    await interaction.editReply({
+      content: `Your wallet${wallets.length > 1 ? "s are" : " is"}: ${wallets
+        .map((v: AccountWallet) => v.address)
+        .join(", ")}`,
+    });
   },
 };
