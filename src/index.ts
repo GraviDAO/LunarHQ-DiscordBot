@@ -1,9 +1,7 @@
-import { Client, Guild, IntentsBitField } from "discord.js";
+import { Client, IntentsBitField } from "discord.js";
 import { handle_interactions, token } from "../config.json";
 import { interactionHandler } from "./utils/interactionHandler";
 import { registerCommands } from "./utils/registerCommands";
-import { setupPollTimeout } from "./utils/setupPollTimeout";
-import { api } from "./services/api";
 import { StartListener } from "./listener/eventListener";
 
 export class LunarAssistant {
@@ -27,35 +25,6 @@ export class LunarAssistant {
     }
   }
 
-  // async startPollTimeouts() {
-  //   const guildPolls = await db.collection("guildPolls").get();
-
-  //   for (const guildPoll of guildPolls.docs) {
-  //     let guild: Guild;
-  //     const polls = ((guildPoll.data() as GuildPolls).polls ?? []).filter(
-  //       (p: Poll) => p.active
-  //     );
-  //     try {
-  //       guild =
-  //         this.client.guilds.cache.get(guildPoll.id) ??
-  //         (await this.client.guilds.fetch(guildPoll.id));
-  //       if (!guild) continue;
-  //     } catch (e) {
-  //       continue;
-  //     }
-  //     try {
-  //       await setupPollTimeout(this, guild, polls);
-  //     } catch (e) {
-  //       console.error(
-  //         `Couldn't create poll timeouts commands for ${guild.name}`
-  //       );
-  //       console.error(e);
-  //     }
-
-  //     await new Promise((r) => setTimeout(r, 1000));
-  //   }
-  // }
-
   start(
     onReady: (lunarAssistantBot: LunarAssistant) => void,
     handleInteractions: boolean
@@ -66,8 +35,6 @@ export class LunarAssistant {
     this.client.once("ready", async () => {
       // Reregister guild commands for all servers
       this.registerGuildCommands();
-
-      // this.startPollTimeouts();
 
       StartListener(this);
 
@@ -99,9 +66,6 @@ export class LunarAssistant {
 const lunarAssistantBot = new LunarAssistant();
 
 // start the lunar assistant bot
-lunarAssistantBot.start(
-  () => {
-    console.log("Ready!");
-  },
-  handle_interactions
-);
+lunarAssistantBot.start(() => {
+  console.log("Ready!");
+}, handle_interactions);

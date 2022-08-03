@@ -22,10 +22,9 @@ export default {
     lunarAssistant: LunarAssistant,
     interaction: ModalSubmitInteraction
   ) => {
-    await interaction.deferReply({ ephemeral: true });
-
-    await interaction.editReply({
+    await interaction.reply({
       embeds: [primaryEmbed(undefined, "Creating proposal...")],
+      ephemeral: true,
     });
 
     const nftAddress = interaction.fields.getTextInputValue("nftAddress");
@@ -102,8 +101,7 @@ export default {
       title: interaction.fields.getTextInputValue("title"),
       description: interaction.fields.getTextInputValue("description"),
       address: nftAddress,
-      // creatorDiscordId: interaction.user.id,
-      creatorDiscordId: "753254544128868415",
+      creatorDiscordId: interaction.user.id,
       quorum: quorum.toString(),
       duration: timestampToDuration(
         timeToTimestamp(interaction.fields.getTextInputValue("time").length == 0? "14d": interaction.fields.getTextInputValue("time"))
@@ -161,10 +159,6 @@ export default {
         });
       }
     }
-
-    // setTimeout(() => {
-    //   archiveProposal(lunarAssistant, message, proposal);
-    // }, data.endsAt - Date.now());
 
     await interaction.editReply({
       embeds: [primaryEmbed(undefined, "Proposal Successfully Created!")],
