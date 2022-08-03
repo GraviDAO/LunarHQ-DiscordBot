@@ -9,25 +9,25 @@ export function castProposalVoteButtons(enabled: boolean = true) {
   return new ActionRowBuilder<ButtonBuilder>({
     components: [
       new ButtonBuilder({
-        customId: "pollVote.yes",
+        customId: "proposalVote.yes",
         label: "Yes",
         style: ButtonStyle.Success,
         disabled: !enabled,
       }),
       new ButtonBuilder({
-        customId: "pollVote.no",
+        customId: "proposalVote.no",
         label: "No",
         style: ButtonStyle.Danger,
         disabled: !enabled,
       }),
       new ButtonBuilder({
-        customId: "pollVote.abstain",
+        customId: "proposalVote.abstain",
         label: "Abstain",
         style: ButtonStyle.Primary,
         disabled: !enabled,
       }),
       new ButtonBuilder({
-        customId: "pollVote.clear",
+        customId: "proposalVote.clear",
         label: "Reset",
         style: ButtonStyle.Secondary,
         disabled: !enabled,

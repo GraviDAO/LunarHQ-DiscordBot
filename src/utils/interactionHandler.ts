@@ -74,7 +74,7 @@ export async function interactionHandler(
   interaction: Interaction
 ) {
   if (
-    ![InteractionType.ApplicationCommand, InteractionType.ModalSubmit].includes(
+    ![InteractionType.ApplicationCommand, InteractionType.ModalSubmit, InteractionType.MessageComponent].includes(
       interaction.type
     )
   )

@@ -1,3 +1,5 @@
+/* leaving it here for now, but should no longer be needed since it is handled by backend
+
 import {
   BaseGuildTextChannel,
   Guild,
@@ -49,3 +51,4 @@ export const setupPollTimeout = async (
     await new Promise((r) => setTimeout(r, 1000));
   }
 };
+*/

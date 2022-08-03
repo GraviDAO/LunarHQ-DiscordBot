@@ -37,20 +37,20 @@ export function proposalEmbed(data: Proposal, author: User) {
       icon_url: author.avatarURL() ?? undefined,
     },
     fields: [
-      // {
-      //   name: "End Time",
-      //   value: `${Formatters.time(
-      //     parseInt((data.endDate / 1000).toFixed(0)),
-      //     "F"
-      //   )} (${Formatters.time(
-      //     parseInt((data.endDate / 1000).toFixed(0)),
-      //     "R"
-      //   )})`,
-      //   inline: true,
-      // },
+      {
+        name: "End Time",
+        value: `${Formatters.time(
+          parseInt((new Date(data.endDate).getTime() / 1000).toFixed(0)),
+          "F"
+        )} (${Formatters.time(
+          parseInt((new Date(data.endDate).getTime() / 1000).toFixed(0)),
+          "R"
+        )})`,
+        inline: true,
+      },
       {
         name: "Quorum",
-        value: data.quorum ? `${data.quorum} Votes` : "Not Specified",
+        value: data.quorum ? `${data.quorum}% of votes required` : "Not Specified",
         inline: true,
       },
     ],

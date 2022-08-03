@@ -53,10 +53,10 @@ export function proposalCreateModal() {
         components: [
           new TextInputBuilder({
             customId: "quorum",
-            label: "Quorum (Number of votes needed)",
+            label: "Quorum (% of votes needed)",
             minLength: 0,
-            maxLength: 4000,
-            placeholder: "e.g.: 40",
+            maxLength: 3,
+            placeholder: "e.g.: 20",
             required: false,
             style: TextInputStyle.Short,
           }),
