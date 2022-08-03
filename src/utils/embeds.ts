@@ -30,7 +30,7 @@ export function proposalEmbed(data: Proposal, author: User) {
     footer: {
       text: data.id.toString(),
     },
-    timestamp: Date.now().toString(),
+    timestamp: Date.now(),
     color: Colors.Blurple,
     author: {
       name: author.tag,

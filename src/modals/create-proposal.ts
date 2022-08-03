@@ -106,7 +106,7 @@ export default {
       creatorDiscordId: "753254544128868415",
       quorum: quorum.toString(),
       duration: timestampToDuration(
-        timeToTimestamp(interaction.fields.getTextInputValue("time") ?? "14d")
+        timeToTimestamp(interaction.fields.getTextInputValue("time").length == 0? "14d": interaction.fields.getTextInputValue("time"))
       ),
       votingSystem: "Weighted voting",
       discordServerId: interaction.guildId!,

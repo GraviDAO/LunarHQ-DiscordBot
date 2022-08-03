@@ -16,6 +16,6 @@ export const timeToTimestamp = (string: string): number => {
       })
       .reduce((prev: number | undefined, curr: number | undefined) => {
         return (prev ?? 0) + (curr ?? 0);
-      }, Date.now()) ?? 0
+      }, 0) ?? 0
   );
 };
