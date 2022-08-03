@@ -7,7 +7,6 @@ import {
 } from "discord.js";
 import { LunarAssistant } from "..";
 import { Proposal } from "../shared/apiTypes";
-import { archiveProposal } from "./archiveProposal";
 
 export const setupPollTimeout = async (
   lunarAssistant: LunarAssistant,
