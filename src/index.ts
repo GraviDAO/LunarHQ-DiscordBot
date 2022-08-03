@@ -4,6 +4,7 @@ import { interactionHandler } from "./utils/interactionHandler";
 import { registerCommands } from "./utils/registerCommands";
 import { setupPollTimeout } from "./utils/setupPollTimeout";
 import { api } from "./services/api";
+import { StartListener } from "./listener/eventListener";
 
 export class LunarAssistant {
   client: Client;
@@ -67,6 +68,8 @@ export class LunarAssistant {
       this.registerGuildCommands();
 
       // this.startPollTimeouts();
+
+      StartListener(this);
 
       // Call the passed onReady function
       onReady(this);
