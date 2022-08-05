@@ -5,10 +5,7 @@ import { GetProposalResultsResponse, Proposal } from "../shared/apiTypes";
 import { castProposalVoteButtons } from "./buttons";
 import { api } from "../services/api";
 
-export const archiveProposal = async (
-  message: Message,
-  proposal: Proposal
-) => {
+export const archiveProposal = async (message: Message, proposal: Proposal) => {
   /* Proposal is already closed by the backend
   try {
     await api.closeProposal(message.guildId!, proposal.id.toString());
@@ -31,7 +28,8 @@ export const archiveProposal = async (
   try {
     results = await api.getProposalResults(
       message.guildId!,
-      proposal.id.toString()
+      proposal.id.toString(),
+      message.id
     );
   } catch (error) {
     console.log(`Could not get proposal results: ${proposal.id}`);

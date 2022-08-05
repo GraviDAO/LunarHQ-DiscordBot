@@ -159,13 +159,15 @@ class API {
 
   async getProposalResults(
     guildId: string,
-    proposalId: string
+    proposalId: string,
+    messageId: string
   ): Promise<GetProposalResultsResponse> {
     return (
       await this.get(
         `getProposalResults/${proposalId}`,
         this.config(this.sign(guildId, ["getProposalResults"]), {
           discordServerId: guildId,
+          discordMessageId: messageId,
         })
       )
     ).data.message;

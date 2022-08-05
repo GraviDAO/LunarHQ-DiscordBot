@@ -65,7 +65,8 @@ export default {
     try {
       results = await api.getProposalResults(
         interaction.guildId!,
-        proposal.id.toString()
+        proposal.id.toString(),
+        interaction.targetMessage.id
       );
     } catch (error) {
       console.log(error);

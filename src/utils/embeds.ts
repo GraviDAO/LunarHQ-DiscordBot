@@ -1,5 +1,11 @@
 import { Colors, EmbedBuilder, Formatters, User } from "discord.js";
-import { CreateProposal, Proposal, ProposalChoice, Poll } from "../shared/apiTypes";
+import {
+  CreateProposal,
+  Proposal,
+  ProposalChoice,
+  Poll,
+} from "../shared/apiTypes";
+import { toPascalCase } from "./helper";
 
 export function primaryEmbed(
   title: string | undefined = undefined,
@@ -50,7 +56,9 @@ export function proposalEmbed(data: Proposal, author: User) {
       },
       {
         name: "Quorum",
-        value: data.quorum ? `${data.quorum}% of votes required` : "Not Specified",
+        value: data.quorum
+          ? `${data.quorum}% of votes required`
+          : "Not Specified",
         inline: true,
       },
     ],
@@ -79,32 +87,35 @@ export function proposalResultsEmbed(
       },
       {
         name: "Status",
-        value: data.status.toUpperCase(),
+        value: toPascalCase(data.status),
         inline: true,
       },
       {
         name: "✅ | Yes Votes",
-        value: `\`\`\`${results.find(
-          (value: ProposalChoice) => value.choice === "yes"
-        )}\`\`\``,
+        value: `\`\`\`${
+          results.filter((value: ProposalChoice) => value.choice === "Yes")
+            .length
+        }\`\`\``,
         inline: true,
       },
       {
         name: "❌ | No Votes",
-        value: `\`\`\`${results.find(
-          (value: ProposalChoice) => value.choice === "no"
-        )}\`\`\``,
+        value: `\`\`\`${
+          results.filter((value: ProposalChoice) => value.choice === "No")
+            .length
+        }\`\`\``,
         inline: true,
       },
       {
         name: "🚫 | Abstain Votes",
-        value: `\`\`\`${results.find(
-          (value: ProposalChoice) => value.choice === "abstain"
-        )}\`\`\``,
+        value: `\`\`\`${
+          results.filter((value: ProposalChoice) => value.choice === "Abstain")
+            .length
+        }\`\`\``,
         inline: true,
       },
     ],
-    timestamp: Date.now().toString(),
+    timestamp: Date.now(),
     color: Colors.Blurple,
   });
 }
