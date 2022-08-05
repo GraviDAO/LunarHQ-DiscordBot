@@ -163,10 +163,9 @@ class API {
   ): Promise<GetProposalResultsResponse> {
     return (
       await this.get(
-        "getProposalResults",
+        `getProposalResults/${proposalId}`,
         this.config(this.sign(guildId, ["getProposalResults"]), {
           discordServerId: guildId,
-          proposalId: proposalId,
         })
       )
     ).data.message;
