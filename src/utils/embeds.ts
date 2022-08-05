@@ -69,6 +69,10 @@ export function proposalResultsEmbed(
   data: Proposal,
   results: ProposalChoice[]
 ) {
+  const totalVotes = results.reduce(
+    (previousResult, currentResult) => previousResult + currentResult.votes, 0
+  );
+  
   return new EmbedBuilder({
     title: `Results for Proposal #${data.id} | __${data.title}__`,
     footer: {
@@ -77,7 +81,7 @@ export function proposalResultsEmbed(
     fields: [
       {
         name: "Total Valid votes",
-        value: `\`\`\`${results!.length}\`\`\``,
+        value: `\`\`\`${totalVotes}\`\`\``,
         inline: true,
       },
       {
@@ -93,24 +97,21 @@ export function proposalResultsEmbed(
       {
         name: "✅ | Yes Votes",
         value: `\`\`\`${
-          results.filter((value: ProposalChoice) => value.choice === "Yes")
-            .length
+          results.filter((value: ProposalChoice) => value.choice === "Yes")[0].votes
         }\`\`\``,
         inline: true,
       },
       {
         name: "❌ | No Votes",
         value: `\`\`\`${
-          results.filter((value: ProposalChoice) => value.choice === "No")
-            .length
+          results.filter((value: ProposalChoice) => value.choice === "No")[0].votes
         }\`\`\``,
         inline: true,
       },
       {
         name: "🚫 | Abstain Votes",
         value: `\`\`\`${
-          results.filter((value: ProposalChoice) => value.choice === "Abstain")
-            .length
+          results.filter((value: ProposalChoice) => value.choice === "Abstain")[0].votes
         }\`\`\``,
         inline: true,
       },
