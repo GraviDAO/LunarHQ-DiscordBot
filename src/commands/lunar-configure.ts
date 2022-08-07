@@ -13,7 +13,7 @@ import {
 } from "../shared/apiTypes";
 import { isValidHttpUrl } from "../utils/helper";
 import { api } from "../services/api";
-import { isValidTerraAddress } from "../utils/isValidTerraAddress";
+import { isValidAddress } from "../utils/isValidAddress";
 
 export default {
   data: new SlashCommandBuilder()
@@ -49,6 +49,10 @@ export default {
               {
                 value: "Terra Classic",
                 name: "Terra Classic",
+              },
+              {
+                value: "polygon-mainnet",
+                name: "Polygon",
               }
             )
         )
@@ -110,6 +114,10 @@ export default {
               {
                 value: "Terra Classic",
                 name: "Terra Classic",
+              },
+              {
+                value: "polygon-mainnet",
+                name: "Polygon",
               }
             )
         )
@@ -163,6 +171,10 @@ export default {
               {
                 value: "Terra Classic",
                 name: "Terra Classic",
+              },
+              {
+                value: "polygon-mainnet",
+                name: "Polygon",
               }
             )
         )
@@ -179,7 +191,7 @@ export default {
               "The quantity of matching token tokens that a user must hold in order to meet the rule."
             )
         )
-    )
+    )/* disabled for now until correctly implemented on backend with event based design
     .addSubcommand((subcommand) =>
       subcommand
         .setName("add-api-rule")
@@ -209,6 +221,10 @@ export default {
               {
                 value: "Terra Classic",
                 name: "Terra Classic",
+              },
+              {
+                value: "polygon-mainnet",
+                name: "Polygon",
               }
             )
         )
@@ -218,7 +234,7 @@ export default {
             .setDescription("The role to give to users which meet this rule.")
             .setRequired(true)
         )
-    )
+    )*/
     .addSubcommand((subcommand) =>
       subcommand
         .setName("view-rules")
@@ -269,9 +285,9 @@ export default {
         rawQuantity = interaction.options.getNumber("quantity") ?? 1;
         rawTokenIds = interaction.options.getString("token-ids");
 
-        if (!isValidTerraAddress(nftAddress)) {
+        if (!isValidAddress(nftAddress, blockchainName)) {
           await interaction.editReply({
-            content: "Invalid terra address",
+            content: "Invalid address",
           });
           return;
         }
@@ -346,16 +362,16 @@ export default {
         rawQuantity = interaction.options.getNumber("quantity") ?? 1;
         rawTokenIds = interaction.options.getString("token-ids");
 
-        if (!isValidTerraAddress(nftAddress)) {
+        if (!isValidAddress(nftAddress, blockchainName)) {
           await interaction.editReply({
-            content: "Invalid terra address",
+            content: "Invalid address",
           });
           return;
         }
 
-        if (!isValidTerraAddress(stakedNftAddress)) {
+        if (!isValidAddress(stakedNftAddress, blockchainName)) {
           await interaction.editReply({
-            content: "Invalid staked terra address",
+            content: "Invalid staked address",
           });
           return;
         }
@@ -427,9 +443,9 @@ export default {
         role = interaction.options.getRole("role", true);
         rawQuantity = interaction.options.getNumber("quantity") ?? 1;
 
-        if (!isValidTerraAddress(tokenAddress)) {
+        if (!isValidAddress(tokenAddress, blockchainName)) {
           await interaction.editReply({
-            content: "Invalid terra address",
+            content: "Invalid address",
           });
           return;
         }
