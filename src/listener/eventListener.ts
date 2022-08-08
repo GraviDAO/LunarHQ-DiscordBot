@@ -58,7 +58,7 @@ export async function StartListener(lunarAssistant: LunarAssistant) {
         } catch (e) {
             return;
         }
-guild
+
         let channel: GuildBasedChannel | null;
         try {
           channel =
@@ -86,7 +86,4 @@ guild
     });
 
     socket.connect();
-    socket.emit("TEST", "This is a test message coming from LunarHQ-DiscordBot");
-    
-
 }
