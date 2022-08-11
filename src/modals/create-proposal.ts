@@ -15,6 +15,7 @@ import { timeToTimestamp } from "../utils/timeToTimestamp";
 import { CreateProposal, Proposal } from "../shared/apiTypes";
 import { api } from "../services/api";
 import { timestampToDuration } from "../utils/timestampToDuration";
+import { isValidAddress } from "../utils/isValidAddress";
 
 export default {
   customId: "create-proposal",
@@ -27,33 +28,22 @@ export default {
       ephemeral: true,
     });
 
-    const nftAddress = interaction.fields.getTextInputValue("nftAddress");
-
-    if (
-      (nftAddress.length != 44 && nftAddress.length != 64) ||
-      !nftAddress.startsWith("terra", 0)
-    ) {
-      await interaction.editReply({
-        content: "Invalid terra address",
-      });
-      return;
-    }
-
     const quorum = parseFloat(
       interaction.fields.getTextInputValue("quorum") ?? 0
     );
     if (quorum < 0 || quorum > 100) {
       await interaction.editReply({
-        content: "Invalid quorum value",
+        content: "Invalid quorum value, must be between 0 and 100",
       });
       return;
     }
 
     let blockchainName: string | undefined;
     await interaction.editReply({
-      embeds: [primaryEmbed("What blockchain is this proposal for?")],
+      embeds: [primaryEmbed("What blockchain is this proposal for? (more chains coming soon!)")],
       components: [blockchainNameChoices()],
     });
+    
     let action;
     try {
       action = await interaction.channel?.awaitMessageComponent({
@@ -74,6 +64,14 @@ export default {
       blockchainName = action?.values.at(0);
     }
 
+    const nftAddress = interaction.fields.getTextInputValue("nftAddress");
+    if (!isValidAddress(nftAddress, blockchainName!)) {
+      await interaction.editReply({
+        content: "Invalid address",
+      });
+      return;
+    }
+
     await action?.deferUpdate();
 
     if (!blockchainName) {
@@ -91,7 +89,7 @@ export default {
       });
     } catch (error) {
       await interaction.editReply({
-        embeds: [primaryEmbed(undefined, "Failed to create proposal")],
+        embeds: [primaryEmbed(undefined, "Failed to create proposal.")],
         components: [],
       });
       return;
@@ -161,7 +159,7 @@ export default {
     }
 
     await interaction.editReply({
-      embeds: [primaryEmbed(undefined, "Proposal Successfully Created!")],
+      embeds: [primaryEmbed(undefined, "Proposal Successfully Created! Please note that it takes time for the system to index the collection if it is not already in the database. Expect about 1 hour per 10k tokens in the collection.")],
     });
   },
 };

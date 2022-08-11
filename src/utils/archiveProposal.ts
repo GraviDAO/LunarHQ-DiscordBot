@@ -6,14 +6,7 @@ import { castProposalVoteButtons } from "./buttons";
 import { api } from "../services/api";
 
 export const archiveProposal = async (message: Message, proposal: Proposal) => {
-  /* Proposal is already closed by the backend
-  try {
-    await api.closeProposal(message.guildId!, proposal.id.toString());
-  } catch (error) {
-    console.log(`Could not close proposal: ${proposal.id}`);
-    return;
-  }
-  */
+
   console.log(`Archiving poll: ${proposal.id}`);
   await message.edit({ components: [castProposalVoteButtons(false)] });
   if (message.thread && !message.thread.archived) {

@@ -42,14 +42,14 @@ export default {
             )
             .setRequired(true)
             .addChoices(
-              {
+              /*{
                 value: "Terra",
                 name: "Terra",
               },
               {
                 value: "Terra Classic",
                 name: "Terra Classic",
-              },
+              },*/
               {
                 value: "polygon-mainnet",
                 name: "Polygon",
@@ -107,14 +107,14 @@ export default {
             )
             .setRequired(true)
             .addChoices(
-              {
+              /*{
                 value: "Terra",
                 name: "Terra",
               },
               {
                 value: "Terra Classic",
                 name: "Terra Classic",
-              },
+              },*/
               {
                 value: "polygon-mainnet",
                 name: "Polygon",
@@ -164,14 +164,14 @@ export default {
             )
             .setRequired(true)
             .addChoices(
-              {
+              /*{
                 value: "Terra",
                 name: "Terra",
               },
               {
                 value: "Terra Classic",
                 name: "Terra Classic",
-              },
+              },*/
               {
                 value: "polygon-mainnet",
                 name: "Polygon",
@@ -338,17 +338,17 @@ export default {
           console.error(e);
           await interaction.editReply({
             content:
-              "Could not create the rule for this server, please try again later.",
+              "Could not create the rule for this server, please try again later. Please note that there is temporary hard cap of 20k tokens maximum for nft collections. Contact us if this is an issue.",
           });
           return;
         }
 
         // reply
         await interaction.editReply({
-          content: "Rule added successfully!",
+          content: "Rule added successfully! Please note that it takes time for the system to index the collection if it is not already in the database. Expect about 1 hour per 10k tokens in the collection.",
         });
         break;
-
+/*
       case "add-staked-nft-rule":
         // configure the server settings
         nftAddress = interaction.options
@@ -532,7 +532,7 @@ export default {
           content: "Rule added successfully!",
         });
         break;
-
+*/
       case "view-rules":
         let getRulesResponse;
         try {

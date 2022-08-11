@@ -6,8 +6,8 @@ import { AccountWallet } from "../shared/apiTypes";
 
 export default {
   data: new SlashCommandBuilder()
-    .setName("lunar-view-wallet")
-    .setDescription("View the wallet linked to your discord account."),
+    .setName("lunar-view-wallets")
+    .setDescription("View the wallets linked to your discord account."),
   execute: async (
     lunarAssistant: LunarAssistant,
     interaction: ChatInputCommandInteraction
@@ -33,7 +33,7 @@ export default {
     }
 
     await interaction.editReply({
-      content: `Your wallet${wallets.length > 1 ? "s are" : " is"}: ${wallets
+      content: `Your wallets${wallets.length > 1 ? "s are" : " is"}: ${wallets
         .map((v: AccountWallet) => v.address)
         .join(", ")}`,
     });

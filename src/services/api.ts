@@ -203,14 +203,17 @@ class API {
     ).data.message;
   }
 
-  async unlinkWallet(userId: string) {
+  async unlinkWallet(userId: string, address: string, blockchainName: string) {
     return (
       await this.put(
         "unlinkWallet",
-        this.config(this.sign(undefined, ["unlinkWallet"])),
+        this.config(this.sign(undefined, ["unlinkWallet"]),
         {
           discordUserId: userId,
-        }
+          address: address,
+          blockchainName: blockchainName,
+        }),
+        {}
       )
     ).data;
   }

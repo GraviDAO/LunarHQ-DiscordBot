@@ -59,8 +59,9 @@ export function blockchainNameChoices() {
       new SelectMenuBuilder({
         customId: "blockchainPicker",
         options: [
-          { label: "Terra", value: "Terra" },
-          { label: "Terra Classic", value: "Terra Classic" },
+          { label: "Polygon", value: "polygon-mainnet" },
+          //{ label: "Terra", value: "Terra" },
+          //{ label: "Terra Classic", value: "Terra Classic" },
         ],
       }),
     ],
