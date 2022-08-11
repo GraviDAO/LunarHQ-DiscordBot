@@ -1,8 +1,7 @@
 import { SlashCommandBuilder } from "@discordjs/builders";
 import { ChatInputCommandInteraction } from "discord.js";
-import jwt from "jsonwebtoken";
 import { LunarAssistant } from "..";
-import { DISCORD_VERIFICATION_SECRET, environment } from "../../config.json";
+import { WEBAPP_URL } from "../../config.json";
 
 export default {
   data: new SlashCommandBuilder()
@@ -14,18 +13,8 @@ export default {
   ) => {
     // verify the interaction is valid
 
-    const token = jwt.sign(
-      { userID: interaction.user.id },
-      DISCORD_VERIFICATION_SECRET,
-      { expiresIn: "1h" }
-    );
-    const url =
-      (environment === "production"
-        ? "https://lunarassistant.com/"
-        : "http://localhost:3000/") + token;
-
     await interaction.reply({
-      content: `Greetings from the Lunar Assistant! Please click [here](${url}) to link your terra wallet with your discord account.`,
+      content: `Greetings from the Lunar Assistant! Please click [here](${WEBAPP_URL}) to link your wallets with your discord account.`,
       ephemeral: true,
     });
   },
