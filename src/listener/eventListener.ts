@@ -6,6 +6,7 @@ import { archiveProposal } from "../utils/archiveProposal";
 import { BaseGuildTextChannel, Guild, GuildBasedChannel, Message } from "discord.js";
 import { Proposal } from "../shared/apiTypes";
 import { LunarAssistant } from "..";
+const logger = require('../logging/logger');
 
 /*
 example1:
@@ -33,8 +34,6 @@ const socket = io("https://example.com", {
 const socket = io("http://localhost:6060");
 
 export default socket;
-
-const logger = require('../logging/logger');
 
 export async function StartListener(lunarAssistant: LunarAssistant) {
 
@@ -66,7 +65,7 @@ export async function StartListener(lunarAssistant: LunarAssistant) {
             (await guild.channels.fetch(proposal.discordChannelId!));
           if (!channel || !(channel instanceof BaseGuildTextChannel)) return;
         } catch (e) {
-          console.log(e);
+          logger.error(e);
           return;
         }
 

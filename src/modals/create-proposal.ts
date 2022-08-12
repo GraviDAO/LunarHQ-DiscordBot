@@ -16,6 +16,7 @@ import { CreateProposal, Proposal } from "../shared/apiTypes";
 import { api } from "../services/api";
 import { timestampToDuration } from "../utils/timestampToDuration";
 import { isValidAddress } from "../utils/isValidAddress";
+const logger = require('../logging/logger');
 
 export default {
   customId: "create-proposal",
@@ -115,7 +116,7 @@ export default {
     try {
       proposal = await api.createProposal(data);
     } catch (error: any) {
-      console.log(error);
+      logger.error(error);
 
       await interaction.editReply({
         embeds: [primaryEmbed("Failed to create proposal", error.message.data)],

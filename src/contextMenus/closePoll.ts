@@ -4,6 +4,7 @@ import { LunarAssistant } from "..";
 import { api } from "../services/api";
 import { castProposalVoteButtons } from "../utils/buttons";
 import { primaryEmbed } from "../utils/embeds";
+const logger = require('../logging/logger');
 
 export default {
   data: new ContextMenuCommandBuilder()
@@ -28,7 +29,7 @@ export default {
     try {
       proposals = await api.getProposals(interaction.guildId!);
     } catch (error) {
-      console.log(error);
+      logger.error(error);
       await interaction.reply({
         embeds: [primaryEmbed(undefined, "Could not get proposals.")],
         ephemeral: true,
@@ -51,7 +52,7 @@ export default {
     try {
       await api.closeProposal(interaction.guildId!, proposal.id.toString());
     } catch (error) {
-      console.log(error);
+      logger.error(error);
       await interaction.reply({
         embeds: [primaryEmbed(undefined, "Could not close proposal.")],
         ephemeral: true,
@@ -64,7 +65,7 @@ export default {
           try {
             await message.thread.setArchived(true, "Poll Closed");
           } catch (error) {
-            console.log(`Could not archive thread: ${message.thread.name}`);
+            logger.error(`Could not archive thread: ${message.thread.name}`);
           }
         }
       }

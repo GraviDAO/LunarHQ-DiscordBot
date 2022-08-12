@@ -16,6 +16,7 @@ import { commandFiles } from "./commandFiles";
 import { buttonFiles } from "./buttonFiles";
 import { contextMenuFiles } from "./contextMenuFiles";
 import { modalFiles } from "./modalFiles";
+const logger = require('../logging/logger');
 
 // Create a collection for the command handles
 const commandHandlers = new Collection<string, SlashCommandData>();
@@ -92,7 +93,7 @@ export async function interactionHandler(
     try {
       await command.execute(this, interaction);
     } catch (error) {
-      console.error(error);
+      logger.error(error);
       if (interaction.replied || interaction.deferred) {
         await interaction.editReply({
           content: "There was an error while executing this command!",
@@ -114,7 +115,7 @@ export async function interactionHandler(
     try {
       await button.execute(this, interaction);
     } catch (error) {
-      console.error(error);
+      logger.error(error);
       if (interaction.replied || interaction.deferred) {
         await interaction.editReply({
           content: "There was an error while executing this command!",
@@ -136,7 +137,7 @@ export async function interactionHandler(
     try {
       await contextMenu.execute(this, interaction);
     } catch (error) {
-      console.error(error);
+      logger.error(error);
       if (interaction.replied || interaction.deferred) {
         await interaction.editReply({
           content: "There was an error while executing this command!",
@@ -158,7 +159,7 @@ export async function interactionHandler(
     try {
       await modal.execute(this, interaction);
     } catch (error) {
-      console.error(error);
+      logger.error(error);
       if (interaction.replied || interaction.deferred) {
         await interaction.editReply({
           content: "There was an error while executing this command!",

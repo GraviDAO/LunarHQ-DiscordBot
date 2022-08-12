@@ -4,16 +4,17 @@ import { LunarAssistant } from "..";
 import { GetProposalResultsResponse, Proposal } from "../shared/apiTypes";
 import { castProposalVoteButtons } from "./buttons";
 import { api } from "../services/api";
+const logger = require('../logging/logger');
 
 export const archiveProposal = async (message: Message, proposal: Proposal) => {
 
-  console.log(`Archiving poll: ${proposal.id}`);
+  logger.info(`Archiving poll: ${proposal.id}`);
   await message.edit({ components: [castProposalVoteButtons(false)] });
   if (message.thread && !message.thread.archived) {
     try {
       await message.thread.setArchived(true, "Poll Closed");
     } catch (error) {
-      console.log(`Could not archive thread: ${message.thread.name}`);
+      logger.error(`Could not archive thread: ${message.thread.name}`);
     }
   }
 
@@ -25,7 +26,7 @@ export const archiveProposal = async (message: Message, proposal: Proposal) => {
       message.id
     );
   } catch (error) {
-    console.log(`Could not get proposal results: ${proposal.id}`);
+    logger.error(`Could not get proposal results: ${proposal.id}`);
     return;
   }
 
@@ -34,7 +35,7 @@ export const archiveProposal = async (message: Message, proposal: Proposal) => {
       embeds: [proposalResultsEmbed(proposal, results.choices)],
     });
   } catch (error) {
-    console.log(
+    logger.error(
       `Could not post results for poll on: ${
         (message.channel as GuildChannel).name
       }`

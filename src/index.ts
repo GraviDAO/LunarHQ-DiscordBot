@@ -3,6 +3,7 @@ import { handle_interactions, token } from "../config.json";
 import { interactionHandler } from "./utils/interactionHandler";
 import { registerCommands } from "./utils/registerCommands";
 import { StartListener } from "./listener/eventListener";
+const logger = require('./logging/logger');
 
 export class LunarAssistant {
   client: Client;
@@ -19,7 +20,7 @@ export class LunarAssistant {
     try {
       await registerCommands();
     } catch (e) {
-      console.error(
+      logger.error(
         `Couldn't register commands due to the following error: ${e}`
       );
     }
@@ -53,8 +54,8 @@ export class LunarAssistant {
     }
 
     this.client.on("rateLimit", (data) => {
-      console.log("Getting rate limited.");
-      console.log(JSON.stringify(data));
+      logger.info("Getting rate limited.");
+      logger.info(JSON.stringify(data));
     });
 
     // start the discord bot
@@ -67,5 +68,5 @@ const lunarAssistantBot = new LunarAssistant();
 
 // start the lunar assistant bot
 lunarAssistantBot.start(() => {
-  console.log("Ready!");
+  logger.info("Ready!");
 }, handle_interactions);

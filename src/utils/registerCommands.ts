@@ -5,6 +5,7 @@ import path from "path";
 import { clientId, token } from "../../config.json";
 import { commandFiles } from "./commandFiles";
 import { contextMenuFiles } from "./contextMenuFiles";
+const logger = require('../logging/logger');
 
 export const registerCommands = async () => {
   // get the list of new commands
@@ -30,5 +31,5 @@ export const registerCommands = async () => {
     body: newCommands.concat(newContextMenus),
   });
 
-  console.log(`Successfully registered application commands`);
+  logger.info(`Successfully registered application commands`);
 };

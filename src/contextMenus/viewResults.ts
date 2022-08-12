@@ -5,6 +5,7 @@ import { primaryEmbed, proposalResultsEmbed } from "../utils/embeds";
 import { api } from "../services/api";
 import { castProposalVoteButtons } from "../utils/buttons";
 import { GetProposalResultsResponse } from "../shared/apiTypes";
+const logger = require('../logging/logger');
 
 export default {
   data: new ContextMenuCommandBuilder()
@@ -29,7 +30,7 @@ export default {
     try {
       proposals = await api.getProposals(interaction.guildId!);
     } catch (error) {
-      console.log(error);
+      logger.error(error);
       await interaction.reply({
         embeds: [primaryEmbed(undefined, "Could not get proposals.")],
         ephemeral: true,
@@ -57,7 +58,7 @@ export default {
         interaction.targetMessage.id
       );
     } catch (error) {
-      console.log(error);
+      logger.error(error);
       await interaction.reply({
         embeds: [primaryEmbed(undefined, "Could not get proposal results.")],
         ephemeral: true,

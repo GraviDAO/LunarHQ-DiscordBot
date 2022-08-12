@@ -3,6 +3,7 @@ import { LunarAssistant } from "..";
 import { api } from "../services/api";
 import { primaryEmbed } from "../utils/embeds";
 import { toCamelCase, toPascalCase } from "../utils/helper";
+const logger = require('../logging/logger');
 
 export default {
   customId: "proposalVote",
@@ -12,7 +13,7 @@ export default {
   ) => {
     await interaction.deferReply({ ephemeral: true });
     const vote = interaction.customId.split(".")[1];
-    console.log(toPascalCase(vote));
+    logger.info(toPascalCase(vote));
 
     try {
       await api.castVote(
@@ -25,7 +26,7 @@ export default {
         embeds: [primaryEmbed(undefined, `You have voted as ${vote}!`)],
       });
     } catch (error) {
-      console.log(error);
+      logger.error(error);
       await interaction.editReply({
         embeds: [
           primaryEmbed(undefined, "Could not cast vote. Please try again."),

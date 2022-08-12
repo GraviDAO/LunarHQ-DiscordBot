@@ -3,6 +3,7 @@ import { ChatInputCommandInteraction } from "discord.js";
 import { LunarAssistant } from "..";
 import { api } from "../services/api";
 import { AccountWallet } from "../shared/apiTypes";
+const logger = require('../logging/logger');
 
 export default {
   data: new SlashCommandBuilder()
@@ -72,7 +73,7 @@ export default {
         content: "Your wallet has been disconnected.",
       });
     } catch (error) {
-      console.log(error);
+      logger.error(error);
       await interaction.editReply({
         content: "Error disconnecting your wallet, please try again later.",
       });

@@ -14,6 +14,7 @@ import {
 import { isValidHttpUrl } from "../utils/helper";
 import { api } from "../services/api";
 import { isValidAddress } from "../utils/isValidAddress";
+const logger = require('../logging/logger');
 
 export default {
   data: new SlashCommandBuilder()
@@ -335,7 +336,7 @@ export default {
         try {
           await api.addNftRule(addNftRuleData);
         } catch (e) {
-          console.error(e);
+          logger.error(e);
           await interaction.editReply({
             content:
               "Could not create the rule for this server, please try again later. Please note that there is temporary hard cap of 20k tokens maximum for nft collections. Contact us if this is an issue.",
@@ -420,7 +421,7 @@ export default {
         try {
           await api.addStakedNftRule(addStakedNftRuleData);
         } catch (e) {
-          console.error(e);
+          logger.error(e);
           await interaction.editReply({
             content:
               "Could not create the rule for this server, please try again later.",
@@ -471,7 +472,7 @@ export default {
         try {
           await api.addTokenRule(addtokenRuleData);
         } catch (e) {
-          console.error(e);
+          logger.error(e);
           await interaction.editReply({
             content:
               "Could not create the rule for this server, please try again later.",
@@ -519,7 +520,7 @@ export default {
         try {
           await api.addApiRule(addApiRule);
         } catch (e) {
-          console.error(e);
+          logger.error(e);
           await interaction.editReply({
             content:
               "Could not create the rule for this server, please try again later.",
@@ -538,7 +539,7 @@ export default {
         try {
           getRulesResponse = await api.getNftRules(interaction.guildId);
         } catch (e) {
-          console.error(e);
+          logger.error(e);
           await interaction.editReply({
             content:
               "Could not get rules for this server, please try again later.",
@@ -587,7 +588,7 @@ export default {
         try {
           await api.deleteRule(interaction.guildId, ruleNumber);
         } catch (e) {
-          console.error(e);
+          logger.error(e);
           await interaction.editReply({
             content:
               "Could not delete the rule for this server, please try again later.",

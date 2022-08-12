@@ -4,6 +4,7 @@ import { LunarAssistant } from "..";
 import { api } from "../services/api";
 import { GetProposalResultsResponse } from "../shared/apiTypes";
 import { primaryEmbed, proposalResultsEmbed } from "../utils/embeds";
+const logger = require('../logging/logger');
 
 export default {
   data: new ContextMenuCommandBuilder()
@@ -28,7 +29,7 @@ export default {
     try {
       proposals = await api.getProposals(interaction.guildId!);
     } catch (error) {
-      console.log(error);
+      logger.error(error);
       await interaction.reply({
         embeds: [primaryEmbed(undefined, "Could not get proposals.")],
         ephemeral: true,
@@ -69,13 +70,13 @@ export default {
         interaction.targetMessage.id
       );
     } catch (error) {
-      console.log(error);
+      logger.error(error);
     }
 
     try {
       await api.deleteProposal(interaction.guildId!, proposal.id.toString());
     } catch (error) {
-      console.log(error);
+      logger.error(error);
       await interaction.reply({
         embeds: [primaryEmbed(undefined, "Could not delete proposal.")],
         ephemeral: true,

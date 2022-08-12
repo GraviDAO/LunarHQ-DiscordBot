@@ -5,6 +5,7 @@ import { proposalCreateModal } from "../utils/modals";
 import { proposalsEmbed } from "../utils/embeds";
 import { api } from "../services/api";
 import { GetProposalsResponse } from "../shared/apiTypes";
+const logger = require('../logging/logger');
 
 export default {
   data: new SlashCommandBuilder()
@@ -57,7 +58,7 @@ export default {
       try {
         getProposalsResponse = await api.getProposals(interaction.guildId);
       } catch (e) {
-        console.error(e);
+        logger.error(e);
         await interaction.editReply({
           content:
             "Could not get rules for this server, please try again later.",
