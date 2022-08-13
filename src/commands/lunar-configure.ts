@@ -77,7 +77,7 @@ export default {
               "A list of token ids that the rule is restricted to."
             )
         )
-    )
+    )/* disabled for now until correctly implemented on backend with event based design
     .addSubcommand((subcommand) =>
       subcommand
         .setName("add-staked-nft-rule")
@@ -108,14 +108,14 @@ export default {
             )
             .setRequired(true)
             .addChoices(
-              /*{
+              {
                 value: "Terra",
                 name: "Terra",
               },
               {
                 value: "Terra Classic",
                 name: "Terra Classic",
-              },*/
+              },
               {
                 value: "polygon-mainnet",
                 name: "Polygon",
@@ -165,14 +165,14 @@ export default {
             )
             .setRequired(true)
             .addChoices(
-              /*{
+              {
                 value: "Terra",
                 name: "Terra",
               },
               {
                 value: "Terra Classic",
                 name: "Terra Classic",
-              },*/
+              },
               {
                 value: "polygon-mainnet",
                 name: "Polygon",
@@ -192,7 +192,7 @@ export default {
               "The quantity of matching token tokens that a user must hold in order to meet the rule."
             )
         )
-    )/* disabled for now until correctly implemented on backend with event based design
+    )
     .addSubcommand((subcommand) =>
       subcommand
         .setName("add-api-rule")
@@ -349,7 +349,7 @@ export default {
           content: "Rule added successfully! Please note that it takes time for the system to index the collection if it is not already in the database. Expect about 1 hour per 10k tokens in the collection.",
         });
         break;
-/*
+
       case "add-staked-nft-rule":
         // configure the server settings
         nftAddress = interaction.options
@@ -533,7 +533,7 @@ export default {
           content: "Rule added successfully!",
         });
         break;
-*/
+
       case "view-rules":
         let getRulesResponse;
         try {
