@@ -7,6 +7,7 @@ import {
   GuildMember,
 } from "discord.js";
 import { LunarAssistant } from "..";
+import { api } from "../services/api";
 const logger = require('../logging/logger');
 
 export default {
@@ -47,14 +48,27 @@ export default {
       let member = guild.members.cache.get(interaction.user.id)
       if(member)
       {
+
+        // Get list of roles from database to only include those in the output of the command.
+        let getRulesResponse;
+        getRulesResponse = await api.getNftRules(interaction.guildId);
+        let dbRoles: string[] = [];
+        for(let indexR = 0; indexR < getRulesResponse.rules.length; indexR++)
+        {
+          const roleName = member.roles.cache.get(getRulesResponse.rules[indexR].role)?.name
+          if(roleName)
+          {
+            dbRoles.push(roleName);
+          }
+        }
+
         for(let index = 0; index < member.roles.cache.size; index++ )
         {
-          if(index >= 1)
-          {
-            activeRolesMessage = activeRolesMessage + ", "
-          }
           const role = member.roles.cache.at(index);
-          activeRolesMessage = activeRolesMessage + role?.name;
+          if(role && dbRoles.includes(role.name))
+          {
+            activeRolesMessage = activeRolesMessage + role.name + ", ";
+          }
         }
       }
 

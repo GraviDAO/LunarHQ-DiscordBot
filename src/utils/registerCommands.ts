@@ -23,14 +23,15 @@ export const registerCommands = async () => {
     return contextMenu.data.toJSON();
   });
 
-  // register the commands
-  const rest = new REST({ version: "9" }).setToken(token);
   try
   {
+    const rest = new REST({ version: "9" }).setToken(token);
+    const commands = newCommands.concat(newContextMenus);
+    // register the commands
     const result = await rest.put(Routes.applicationCommands(clientId) as any, {
-      body: newCommands.concat(newContextMenus),
+      body: commands,
     });
-    logger.info(`Successfully registered application commands: ${JSON.stringify(result)}`);
+    logger.info(`Successfully registered application commands`);//: ${JSON.stringify(result)}`);
   }
   catch(error)
   {
