@@ -1,6 +1,5 @@
 import { REST } from "@discordjs/rest";
 import { Routes } from "discord-api-types/v9";
-import { Guild } from "discord.js";
 import path from "path";
 import { clientId, token } from "../../config.json";
 import { commandFiles } from "./commandFiles";
@@ -26,10 +25,16 @@ export const registerCommands = async () => {
 
   // register the commands
   const rest = new REST({ version: "9" }).setToken(token);
-
-  await rest.put(Routes.applicationCommands(clientId) as any, {
-    body: newCommands.concat(newContextMenus),
-  });
-
-  logger.info(`Successfully registered application commands`);
+  try
+  {
+    const result = await rest.put(Routes.applicationCommands(clientId) as any, {
+      body: newCommands.concat(newContextMenus),
+    });
+    logger.info(`Successfully registered application commands: ${JSON.stringify(result)}`);
+  }
+  catch(error)
+  {
+    logger.error(`Error: ${error} while registering commands`);
+  }
+  
 };

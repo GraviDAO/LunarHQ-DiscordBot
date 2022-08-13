@@ -2,7 +2,7 @@ import winston, { format } from 'winston';
 import  DailyRotateFile from 'winston-daily-rotate-file';
 
 const rotatingArchivingTransport: DailyRotateFile = new DailyRotateFile({
-    filename: 'logs/lunarHQ-%DATE%.log',
+    filename: 'logs/lunarHQ-DiscordBot-%DATE%.log',
     datePattern: 'YYYY-MM-DD',
     zippedArchive: true,
     maxSize: '20m',
