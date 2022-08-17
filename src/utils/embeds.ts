@@ -1,4 +1,4 @@
-import { Colors, EmbedBuilder, Formatters, User } from "discord.js";
+import { Colors, EmbedBuilder, Formatters, time, User } from "discord.js";
 import {
   CreateProposal,
   Proposal,
@@ -45,10 +45,10 @@ export function proposalEmbed(data: Proposal, author: User) {
     fields: [
       {
         name: "End Time",
-        value: `${Formatters.time(
+        value: `${time(
           parseInt((new Date(data.endDate).getTime() / 1000).toFixed(0)),
           "F"
-        )} (${Formatters.time(
+        )} (${time(
           parseInt((new Date(data.endDate).getTime() / 1000).toFixed(0)),
           "R"
         )})`,
