@@ -16,14 +16,14 @@ export default {
     logger.info(toPascalCase(vote));
 
     try {
-      await api.castVote(
+      const returnMessage = await api.castVote(
         interaction.guildId!,
         toPascalCase(vote),
         interaction.user.id,
         interaction.message.id
       );
       await interaction.editReply({
-        embeds: [primaryEmbed(undefined, `You have voted as ${vote}!`)],
+        embeds: [primaryEmbed(undefined, `${returnMessage.message}. Final weight calculation will be done when the poll closes.`)],
       });
     } catch (error) {
       logger.error(error);
