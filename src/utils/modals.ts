@@ -55,7 +55,7 @@ export function proposalCreateModal() {
             customId: "quorum",
             label: "Quorum (% of votes needed)",
             minLength: 0,
-            maxLength: 3,
+            maxLength: 4000,
             placeholder: "e.g.: 20",
             required: false,
             style: TextInputStyle.Short,
