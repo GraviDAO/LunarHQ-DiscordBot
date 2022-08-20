@@ -42,6 +42,8 @@ export interface nftRuleData {
   role: string;
   discordServerId: string;
   blockchainName: string;
+  discordChannelId: string;
+  discordMessageId: string;
 }
 
 export interface stakedNftRuleData {

@@ -331,6 +331,8 @@ export default {
           role: role.id,
           discordServerId: interaction.guild.id,
           blockchainName: blockchainName,
+          discordChannelId: typeof(interaction.channel?.id!) === "string"? interaction.channel?.id! : "",
+          discordMessageId: "",
         };
 
         try {
