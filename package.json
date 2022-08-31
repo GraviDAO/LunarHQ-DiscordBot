@@ -9,8 +9,8 @@
     "start": "tsc && node dist/src/index.js"
   },
   "keywords": [],
-  "author": "",
-  "license": "ISC",
+  "author": "GraviDAO/DRITConsulting",
+  "license": "GNU GPLv3",
   "dependencies": {
     "@discordjs/builders": "^0.13.0",
     "@discordjs/rest": "0.1.0-canary.0",
