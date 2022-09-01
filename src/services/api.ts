@@ -19,6 +19,8 @@ interface apiParams {
   token?: string;
 }
 
+const SUB = "discordBot";
+
 class API {
   private apiBaseUrl: string = lunarHQ_url;
   private apiToken: string = API_SECRET;
@@ -33,6 +35,7 @@ class API {
       await this.get(
         "getRules",
         this.config(this.sign(guildId, ["getRules"]), {
+          sub: SUB,
           discordServerId: guildId,
         })
       )
@@ -44,6 +47,7 @@ class API {
       await this.delete(
         `deleteRule/${ruleId}`,
         this.config(this.sign(guildId, ["deleteRule"]), {
+          sub: SUB,
           discordServerId: guildId,
         })
       )
@@ -54,7 +58,9 @@ class API {
     return (
       await this.post(
         "addNftRule",
-        this.config(this.sign(data.discordServerId, ["addNftRule"])),
+        this.config(this.sign(data.discordServerId, ["addNftRule"]), {
+          sub: SUB,
+        }),
         data
       )
     ).data;
@@ -64,7 +70,9 @@ class API {
     return (
       await this.post(
         "addStakedNftRule",
-        this.config(this.sign(data.discordServerId, ["addStakedNftRule"])),
+        this.config(this.sign(data.discordServerId, ["addStakedNftRule"]), {
+          sub: SUB,
+        }),
         data
       )
     ).data;
@@ -74,7 +82,9 @@ class API {
     return (
       await this.post(
         "addTokenRule",
-        this.config(this.sign(data.discordServerId, ["addTokenRule"])),
+        this.config(this.sign(data.discordServerId, ["addTokenRule"]), {
+          sub: SUB,
+        }),
         data
       )
     ).data;
@@ -84,7 +94,9 @@ class API {
     return (
       await this.post(
         "addApiRule",
-        this.config(this.sign(data.discordServerId, ["addApiRule"])),
+        this.config(this.sign(data.discordServerId, ["addApiRule"]), {
+          sub: SUB,
+        }),
         data
       )
     ).data;
@@ -94,7 +106,9 @@ class API {
     return (
       await this.post(
         "createProposal",
-        this.config(this.sign(data.discordServerId, ["createProposal"])),
+        this.config(this.sign(data.discordServerId, ["createProposal"]), {
+          sub: SUB,
+        }),
         data
       )
     ).data.message;
@@ -108,6 +122,7 @@ class API {
       await this.delete(
         `deleteProposal/${proposalId}`,
         this.config(this.sign(guildId, ["deleteProposal"]), {
+          sub: SUB,
           discordServerId: guildId,
         })
       )
@@ -119,6 +134,7 @@ class API {
       await this.get(
         "getProposals",
         this.config(this.sign(guildId, ["getProposals"]), {
+          sub: SUB,
           discordServerId: guildId,
         })
       )
@@ -134,6 +150,7 @@ class API {
         `openProposal/${proposalId}`,
         this.config(this.sign(guildId, ["openProposal"])),
         {
+          sub: SUB,
           discordServerId: guildId,
           proposalId: proposalId,
         }
@@ -150,6 +167,7 @@ class API {
         `closeProposal/${proposalId}`,
         this.config(this.sign(guildId, ["closeProposal"])),
         {
+          sub: SUB,
           discordServerId: guildId,
           proposalId: proposalId,
         }
@@ -166,6 +184,7 @@ class API {
       await this.get(
         `getProposalResults/${proposalId}`,
         this.config(this.sign(guildId, ["getProposalResults"]), {
+          sub: SUB,
           discordServerId: guildId,
           discordMessageId: messageId,
         })
@@ -184,6 +203,7 @@ class API {
         "castVote",
         this.config(this.sign(guildId, ["castVote"])),
         {
+          sub: SUB,
           discordUserId: userId,
           discordMessageId: messageId,
           vote: vote,
@@ -197,6 +217,7 @@ class API {
       await this.get(
         "getUsersWallets",
         this.config(this.sign(undefined, ["getUsersWallets"]), {
+          sub: SUB,
           discordUserId: userId,
         })
       )
@@ -209,6 +230,7 @@ class API {
         "unlinkWallet",
         this.config(this.sign(undefined, ["unlinkWallet"]),
         {
+          sub: SUB,
           discordUserId: userId,
           address: address,
           blockchainName: blockchainName,
