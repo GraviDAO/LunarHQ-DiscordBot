@@ -43,11 +43,11 @@ export default {
             )
             .setRequired(true)
             .addChoices(
-              /*{
+              {
                 value: "Terra",
                 name: "Terra",
               },
-              {
+              /*{
                 value: "Terra Classic",
                 name: "Terra Classic",
               },*/
