@@ -274,6 +274,7 @@ export default {
     let apiUrl;
     let ruleNumber;
     let tokenIds;
+    let tokenIdArray: string[] = [];
 
     switch (interaction.options.getSubcommand(true)) {
       case "add-nft-rule":
@@ -294,22 +295,18 @@ export default {
         }
 
         // verify that we can parse tokenIds
-        try {
-          tokenIds = rawTokenIds ? JSON.parse(rawTokenIds) : undefined;
-          // check that the tokenIds is properly formatted
-          if (
-            tokenIds &&
-            !(
-              Array.isArray(tokenIds) &&
-              tokenIds.every((tokenId) => typeof tokenId == "string")
-            )
-          ) {
-            throw new Error("Token ids are not an array of strings");
+        try
+        {
+          if(rawTokenIds)
+          {
+            tokenIdArray = rawTokenIds.split(",").map(s => s.trim());
           }
-        } catch {
+        }
+        catch
+        {
           await interaction.editReply({
             content:
-              'Could not parse token ids, please pass token ids in the following format: ["1", "2", "4"] and if it is a single entry write ["#"] and make sure to use the "-sign and not the similar looking “-sign!!! Write ["#"] not [“#“].',
+              'Could not parse token ids, please list token ids using a coma , to seperate values like so: 152,19,421',
           });
           return;
         }
@@ -326,7 +323,7 @@ export default {
 
         const addNftRuleData: nftRuleData = {
           nftAddress: nftAddress,
-          tokenIds: { ...(tokenIds && { tokenIds }) },
+          tokenIds: tokenIdArray,
           quantity: rawQuantity,
           role: role.id,
           discordServerId: interaction.guild.id,
@@ -380,22 +377,18 @@ export default {
         }
 
         // verify that we can parse tokenIds
-        try {
-          tokenIds = rawTokenIds ? JSON.parse(rawTokenIds) : undefined;
-          // check that the tokenIds is properly formatted
-          if (
-            tokenIds &&
-            !(
-              Array.isArray(tokenIds) &&
-              tokenIds.every((tokenId) => typeof tokenId == "string")
-            )
-          ) {
-            throw new Error("Token ids are not an array of strings");
+        try
+        {
+          if(rawTokenIds)
+          {
+            tokenIdArray = rawTokenIds.split(",").map(s => s.trim());
           }
-        } catch {
+        }
+        catch
+        {
           await interaction.editReply({
             content:
-              'Could not parse token ids, please pass token ids in the following format: ["1", "2", "4"] and if it is a single entry write ["#"] and make sure to use the "-sign and not the similar looking “-sign!!! Write ["#"] not [“#“].',
+              'Could not parse token ids, please list token ids using a coma , to seperate values like so: 152,19,421',
           });
           return;
         }
@@ -413,7 +406,7 @@ export default {
         const addStakedNftRuleData: stakedNftRuleData = {
           nftAddress: nftAddress,
           stakedNftAddress: stakedNftAddress,
-          tokenIds: { ...(tokenIds && { tokenIds }) },
+          tokenIds: tokenIdArray,
           quantity: rawQuantity,
           role: role.id,
           discordServerId: interaction.guild.id,
