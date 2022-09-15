@@ -299,6 +299,10 @@ export default {
         {
           if(rawTokenIds)
           {
+            if(rawTokenIds.includes("[") || rawTokenIds.includes("]") || rawTokenIds.includes("'") || rawTokenIds.includes("\""))
+            {
+              throw new Error(`Invalid character in tokenIds`);
+            }
             tokenIdArray = rawTokenIds.split(",").map(s => s.trim());
           }
         }
@@ -306,7 +310,7 @@ export default {
         {
           await interaction.editReply({
             content:
-              'Could not parse token ids, please list token ids using a coma , to seperate values like so: 152,19,421',
+              'Could not parse token ids, please list token ids using a coma , to seperate values like so: 152, 19, 421',
           });
           return;
         }
@@ -381,6 +385,10 @@ export default {
         {
           if(rawTokenIds)
           {
+            if(rawTokenIds.includes("[") || rawTokenIds.includes("]") || rawTokenIds.includes("'") || rawTokenIds.includes("\""))
+            {
+              throw new Error(`Invalid character in tokenIds`);
+            }
             tokenIdArray = rawTokenIds.split(",").map(s => s.trim());
           }
         }
@@ -388,7 +396,7 @@ export default {
         {
           await interaction.editReply({
             content:
-              'Could not parse token ids, please list token ids using a coma , to seperate values like so: 152,19,421',
+              'Could not parse token ids, please list token ids using a coma , to seperate values like so: 152, 19, 421',
           });
           return;
         }
