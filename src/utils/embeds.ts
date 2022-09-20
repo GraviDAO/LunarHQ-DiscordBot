@@ -70,9 +70,10 @@ export function proposalResultsEmbed(
   results: ProposalChoice[]
 ) {
   const totalVotes = results.reduce(
-    (previousResult, currentResult) => previousResult + currentResult.votes, 0
+    (previousResult, currentResult) => previousResult + currentResult.votes,
+    0
   );
-  
+
   return new EmbedBuilder({
     title: `Results for Proposal #${data.id} | __${data.title}__`,
     footer: {
@@ -97,21 +98,25 @@ export function proposalResultsEmbed(
       {
         name: "✅ | Yes Votes",
         value: `\`\`\`${
-          results.filter((value: ProposalChoice) => value.choice === "Yes")[0].votes
+          results.filter((value: ProposalChoice) => value.choice === "Yes")[0]
+            .votes
         }\`\`\``,
         inline: true,
       },
       {
         name: "❌ | No Votes",
         value: `\`\`\`${
-          results.filter((value: ProposalChoice) => value.choice === "No")[0].votes
+          results.filter((value: ProposalChoice) => value.choice === "No")[0]
+            .votes
         }\`\`\``,
         inline: true,
       },
       {
         name: "🚫 | Abstain Votes",
         value: `\`\`\`${
-          results.filter((value: ProposalChoice) => value.choice === "Abstain")[0].votes
+          results.filter(
+            (value: ProposalChoice) => value.choice === "Abstain"
+          )[0].votes
         }\`\`\``,
         inline: true,
       },
@@ -154,5 +159,20 @@ export function proposalsEmbed(proposals: Proposal[]) {
         })\n`,
       };
     }),
+  });
+}
+
+export function lunarAssistantPanelEmbed() {
+  return new EmbedBuilder({
+    title: "Link your ownership",
+    description:
+      "Lunar Assistant verifies your web3 ownership on Discord.\nLink your wallet to get started, leave the rest to us.\n:black_small_square: :white_small_square: :black_small_square: :white_small_square:\n*P.S. Don't be stupid, Never share seeds or keys. DYOR.*",
+    color: 65535,
+    footer: {
+      text: "Built by GraviDAO",
+    },
+    thumbnail: {
+      url: "https://cdn.discordapp.com/attachments/911237611371241492/1011786559021907968/Lunar_Assistant_Mascotte_2.3.png",
+    },
   });
 }

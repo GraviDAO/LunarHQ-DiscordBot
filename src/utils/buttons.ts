@@ -2,8 +2,10 @@ import {
   ActionRowBuilder,
   ButtonBuilder,
   ButtonStyle,
+  ComponentType,
   SelectMenuBuilder,
 } from "discord.js";
+import { WEBAPP_URL } from "../../config.json";
 
 export function castProposalVoteButtons(enabled: boolean = true) {
   return new ActionRowBuilder<ButtonBuilder>({
@@ -63,6 +65,33 @@ export function blockchainNameChoices() {
           { label: "Terra", value: "Terra" },
           //{ label: "Terra Classic", value: "Terra Classic" },
         ],
+      }),
+    ],
+  });
+}
+
+export function lunarAssistantPanelButtons() {
+  return new ActionRowBuilder<ButtonBuilder>({
+    components: [
+      new ButtonBuilder({
+        url: WEBAPP_URL,
+        label: "Lunar Link",
+        style: ButtonStyle.Link,
+      }),
+      new ButtonBuilder({
+        customId: "viewRoles",
+        label: "View Roles",
+        style: ButtonStyle.Secondary,
+      }),
+      new ButtonBuilder({
+        url: "https://lunarassistant.io/",
+        label: "Website",
+        style: ButtonStyle.Link,
+      }),
+      new ButtonBuilder({
+        url: "https://linktr.ee/gravidao",
+        label: "Socials",
+        style: ButtonStyle.Link,
       }),
     ],
   });
