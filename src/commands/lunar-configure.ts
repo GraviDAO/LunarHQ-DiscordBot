@@ -570,6 +570,7 @@ export default {
             apiUrl: rule.apiUrl,
             quantity: rule.quantity,
             role: roleName,
+            tokenIds: rule.tokenIds,
             createdTimestamp: rule.createdAt,
           };
         });
