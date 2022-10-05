@@ -47,10 +47,10 @@ export default {
                 value: "Terra",
                 name: "Terra",
               },
-              /*{
+              {
                 value: "Terra Classic",
                 name: "Terra Classic",
-              },*/
+              },
               {
                 value: "polygon-mainnet",
                 name: "Polygon",

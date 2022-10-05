@@ -63,7 +63,7 @@ export function blockchainNameChoices() {
         options: [
           { label: "Polygon", value: "polygon-mainnet" },
           { label: "Terra", value: "Terra" },
-          //{ label: "Terra Classic", value: "Terra Classic" },
+          { label: "Terra Classic", value: "Terra Classic" },
         ],
       }),
     ],
