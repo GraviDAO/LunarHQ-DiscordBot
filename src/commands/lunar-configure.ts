@@ -142,7 +142,7 @@ export default {
               "A list of token ids that the rule is restricted to."
             )
         )
-    )
+    )*/
     .addSubcommand((subcommand) =>
       subcommand
         .setName("add-token-rule")
@@ -192,7 +192,7 @@ export default {
               "The quantity of matching token tokens that a user must hold in order to meet the rule."
             )
         )
-    )
+    )/*
     .addSubcommand((subcommand) =>
       subcommand
         .setName("add-api-rule")
