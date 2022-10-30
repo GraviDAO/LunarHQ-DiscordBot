@@ -205,6 +205,24 @@ class API {
     ).data;
   }
 
+  async resetVote(
+    guildId: string,
+    userId: string,
+    messageId: string
+  ) {
+    return (
+      await this.put(
+        "resetVote",
+        this.config(this.sign(guildId, ["resetVote"]), {
+          discordUserId: userId,
+          discordMessageId: messageId,
+          discordServerId: guildId,
+        }),
+        {}
+      )
+    ).data;
+  }
+
   async getUsersWallets(userId: string): Promise<GetUsersWalletsResponse> {
     return (
       await this.get(

@@ -15,32 +15,53 @@ export default {
     const vote = interaction.customId.split(".")[1];
     logger.info(toPascalCase(vote));
 
-    try {
-      const returnMessage = await api.castVote(
-        interaction.guildId!,
-        toPascalCase(vote),
-        interaction.user.id,
-        interaction.message.id
-      );
-      await interaction.editReply({
-        embeds: [primaryEmbed(undefined, `${returnMessage.message}. Final weight calculation will be done when the poll closes.`)],
-      });
-    } catch (error) {
-      logger.error(error);
-      if(error instanceof Error && error.message.includes("403")) {
+    if(toPascalCase(vote) !== "Clear") {
+      try {
+        const returnMessage = await api.castVote(
+          interaction.guildId!,
+          toPascalCase(vote),
+          interaction.user.id,
+          interaction.message.id
+        );
         await interaction.editReply({
-          embeds: [
-            primaryEmbed(undefined, "You own no amount of the required asset."),
-          ],
+          embeds: [primaryEmbed(undefined, `${returnMessage.message}. Final weight calculation will be done when the poll closes.`)],
         });
-      } else {
-        await interaction.editReply({
-          embeds: [
-            primaryEmbed(undefined, "Could not cast vote. Please try again."),
-          ],
-        });
+      } catch (error) {
+        logger.error(error);
+        if(error instanceof Error && error.message.includes("403")) {
+          await interaction.editReply({
+            embeds: [
+              primaryEmbed(undefined, "You own no amount of the required asset."),
+            ],
+          });
+        } else {
+          await interaction.editReply({
+            embeds: [
+              primaryEmbed(undefined, "Could not cast vote. Please try again."),
+            ],
+          });
+        }
+        return;
       }
-      return;
-    }
+    } else {
+      try {
+        const returnMessage = await api.resetVote(
+          interaction.guildId!,
+          interaction.user.id,
+          interaction.message.id
+        );
+        await interaction.editReply({
+          embeds: [primaryEmbed(undefined, `${returnMessage.message}`)],
+        });
+      } catch (error) {
+        logger.error(error);
+        await interaction.editReply({
+          embeds: [
+            primaryEmbed(undefined, "Could not reset vote. Please try again."),
+          ],
+        });
+        return;
+      }
+    }    
   },
 };
