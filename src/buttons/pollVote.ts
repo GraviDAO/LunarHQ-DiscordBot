@@ -27,11 +27,19 @@ export default {
       });
     } catch (error) {
       logger.error(error);
-      await interaction.editReply({
-        embeds: [
-          primaryEmbed(undefined, "Could not cast vote. Please try again."),
-        ],
-      });
+      if(error instanceof Error && error.message.includes("403")) {
+        await interaction.editReply({
+          embeds: [
+            primaryEmbed(undefined, "You own no amount of the required asset."),
+          ],
+        });
+      } else {
+        await interaction.editReply({
+          embeds: [
+            primaryEmbed(undefined, "Could not cast vote. Please try again."),
+          ],
+        });
+      }
       return;
     }
   },

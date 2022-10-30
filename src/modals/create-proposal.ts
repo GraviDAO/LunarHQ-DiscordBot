@@ -106,8 +106,8 @@ export default {
       quorum: quorum.toString(),
       startDate: nowDate,
       endDate: new Date(
-        nowDate.getDate() +
-        timeToTimestamp(interaction.fields.getTextInputValue("time").length == 0 ? "14d" : interaction.fields.getTextInputValue("time"))
+        new Date(Date.now() +
+        timeToTimestamp(interaction.fields.getTextInputValue("time").length == 0 ? "14d" : interaction.fields.getTextInputValue("time")))
       ),
       votingSystem: "Token Weighted Voting",
       discordServerId: interaction.guildId!,
