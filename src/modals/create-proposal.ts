@@ -105,7 +105,7 @@ export default {
       duration: timestampToDuration(
         timeToTimestamp(interaction.fields.getTextInputValue("time").length == 0? "14d": interaction.fields.getTextInputValue("time"))
       ),
-      votingSystem: "Weighted voting",
+      votingSystem: "Token Weighted Voting",
       discordServerId: interaction.guildId!,
       discordChannelId: interaction.channel!.id,
       discordMessageId: message.id,
