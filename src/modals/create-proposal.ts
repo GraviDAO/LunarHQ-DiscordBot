@@ -96,20 +96,26 @@ export default {
       return;
     }
 
+    const nowDate = new Date(Date.now());
+
     const data: CreateProposal = {
       title: interaction.fields.getTextInputValue("title"),
       description: interaction.fields.getTextInputValue("description"),
       address: nftAddress,
       creatorDiscordId: interaction.user.id,
       quorum: quorum.toString(),
-      duration: timestampToDuration(
-        timeToTimestamp(interaction.fields.getTextInputValue("time").length == 0? "14d": interaction.fields.getTextInputValue("time"))
+      startDate: nowDate,
+      endDate: new Date(
+        nowDate.getDate() +
+        timeToTimestamp(interaction.fields.getTextInputValue("time").length == 0 ? "14d" : interaction.fields.getTextInputValue("time"))
       ),
       votingSystem: "Token Weighted Voting",
       discordServerId: interaction.guildId!,
       discordChannelId: interaction.channel!.id,
       discordMessageId: message.id,
       blockchainName: blockchainName,
+      numberPerVote: 1,
+      ruleIds: []
     };
 
     let proposal: Proposal;

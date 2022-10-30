@@ -72,17 +72,20 @@ export interface apiRuleData {
 }
 
 export interface CreateProposal {
-  title: string;
-  description: string;
-  address: string;
-  votingSystem: string;
-  creatorDiscordId: string;
-  quorum: string;
-  duration: string;
-  discordServerId: string;
-  discordMessageId: string;
-  discordChannelId: string;
-  blockchainName: string;
+  title: string,
+    description: string,
+    address: string,
+    votingSystem: string,
+    creatorDiscordId: string,
+    quorum: string,
+    discordServerId: string,
+    blockchainName: string,
+    discordMessageId?: string,
+    discordChannelId: string,
+    numberPerVote: number,
+    startDate: Date,
+    endDate: Date,
+    ruleIds: string[]
 }
 
 export interface CreateProposalAddMsgId {

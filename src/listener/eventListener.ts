@@ -153,10 +153,12 @@ export async function StartListener(lunarAssistant: LunarAssistant) {
         }
       }
 
-      try {
-        await api.createProposalAddMsgId(proposal.discordServerId, { proposalId: proposal.id, discordMessageId: message.id });
-      } catch(error) {
-        logger.error(`proposalStarted: Failed to add messageId for existing proposal: ${proposal.id}.`);
+      if(!proposal.discordMessageId) {
+        try {
+          await api.createProposalAddMsgId(proposal.discordServerId, { proposalId: proposal.id, discordMessageId: message.id });
+        } catch(error) {
+          logger.error(`proposalStarted: Failed to add messageId for existing proposal: ${proposal.id}.`);
+        }
       }
 
       callback("ok");
