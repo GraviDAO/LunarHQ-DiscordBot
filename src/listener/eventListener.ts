@@ -8,6 +8,7 @@ import { Proposal } from "../shared/apiTypes";
 import { LunarAssistant } from "..";
 import { primaryEmbed, proposalEmbed } from "../utils/embeds";
 import { castProposalVoteButtons } from "../utils/buttons";
+import { api } from "../services/api";
 const logger = require('../logging/logger');
 
 /*
@@ -150,6 +151,13 @@ export async function StartListener(lunarAssistant: LunarAssistant) {
             ],
           });
         }
+      }
+
+      try {
+        await api.createProposalAddMsgId(proposal.discordServerId, { proposalId: proposal.id, discordMessageId: message.id });
+      } catch(error) {
+        logger.error(`proposalStarted: Failed to add messageId for existing proposal: ${proposal.id}.`);
+        return;
       }
 
       callback("ok");

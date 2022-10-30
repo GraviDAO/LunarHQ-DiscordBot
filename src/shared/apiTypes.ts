@@ -85,6 +85,11 @@ export interface CreateProposal {
   blockchainName: string;
 }
 
+export interface CreateProposalAddMsgId {
+  proposalId: number,
+  discordMessageId: string,
+}
+
 export interface Proposal {
   id: number;
   title: string;

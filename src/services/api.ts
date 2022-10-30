@@ -4,6 +4,7 @@ import jwt from "jsonwebtoken";
 import {
   apiRuleData,
   CreateProposal,
+  CreateProposalAddMsgId,
   GetProposalResultsResponse,
   GetProposalsResponse,
   GetRulesResponse,
@@ -97,6 +98,16 @@ class API {
       await this.post(
         "createProposal",
         this.config(this.sign(data.discordServerId, ["createProposal"])),
+        data
+      )
+    ).data.message;
+  }
+
+  async createProposalAddMsgId(discordServerId: string, data: CreateProposalAddMsgId): Promise<Proposal> {
+    return (
+      await this.post(
+        "createProposal",
+        this.config(this.sign(discordServerId, ["createProposal"])),
         data
       )
     ).data.message;
