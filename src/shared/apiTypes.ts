@@ -61,6 +61,7 @@ export interface tokenRuleData {
   quantity: number;
   role: string;
   discordServerId: string;
+  discordChannelId: string;
   blockchainName: string;
 }
 

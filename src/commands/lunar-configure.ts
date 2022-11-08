@@ -469,6 +469,7 @@ export default {
           blockchainName: blockchainName,
           quantity: rawQuantity,
           role: role.id,
+          discordChannelId: typeof(interaction.channel?.id!) === "string"? interaction.channel?.id! : "",
           discordServerId: interaction.guild.id,
         };
 
