@@ -25,6 +25,7 @@ export interface GenericRule {
   blockchainName: string;
   address: string;
   quantity: number | null;
+  quantityOperatorName: string,
   role: string;
   tokenIds: string[] | null;
   apiUrl: string;
@@ -39,6 +40,7 @@ export interface nftRuleData {
   nftAddress: string;
   tokenIds: string[];
   quantity: number;
+  quantityOperatorName: string,
   role: string;
   discordServerId: string;
   blockchainName: string;
@@ -51,6 +53,7 @@ export interface stakedNftRuleData {
   stakedNftAddress: string;
   tokenIds: string[];
   quantity: number;
+  quantityOperatorName: string,
   role: string;
   discordServerId: string;
   blockchainName: string;
@@ -59,6 +62,7 @@ export interface stakedNftRuleData {
 export interface tokenRuleData {
   tokenAddress: string;
   quantity: number;
+  quantityOperatorName: string,
   role: string;
   discordServerId: string;
   discordChannelId: string;
