@@ -109,7 +109,7 @@ export default {
         new Date(Date.now() +
         timeToTimestamp(interaction.fields.getTextInputValue("time").length == 0 ? "14d" : interaction.fields.getTextInputValue("time")))
       ),
-      votingSystem: "Token Weighted Voting",
+      votingSystem: "Nft Weighted Voting",
       discordServerId: interaction.guildId!,
       discordChannelId: interaction.channel!.id,
       discordMessageId: message.id,
