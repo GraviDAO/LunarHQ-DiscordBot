@@ -9,13 +9,18 @@ const logger = require('../logging/logger');
 export const archiveProposal = async (message: Message, proposal: Proposal) => {
 
   logger.info(`Archiving poll: ${proposal.id}`);
-  await message.edit({ components: [castProposalVoteButtons(false)] });
-  if (message.thread && !message.thread.archived) {
-    try {
-      await message.thread.setArchived(true, "Poll Closed");
-    } catch (error) {
-      logger.error(`Could not archive thread: ${message.thread.name}`);
+  try {
+    await message.edit({ components: [castProposalVoteButtons(false)] });
+    if (message.thread && !message.thread.archived) {
+      try {
+        await message.thread.setArchived(true, "Poll Closed");
+      } catch (error) {
+        logger.error(`Could not archive thread: ${message.thread.name}`);
+      }
     }
+  }
+  catch (error) {
+    logger.error(`Could not edit message for poroposalId: ${proposal.id}`);
   }
 
   let results: GetProposalResultsResponse;
@@ -36,9 +41,7 @@ export const archiveProposal = async (message: Message, proposal: Proposal) => {
     });
   } catch (error) {
     logger.error(
-      `Could not post results for poll on: ${
-        (message.channel as GuildChannel).name
-      }`
+      `Could not post results for poroposalId: ${proposal.id}`
     );
   }
 };
