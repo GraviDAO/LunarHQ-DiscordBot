@@ -64,6 +64,7 @@ export function blockchainNameChoices() {
           { label: "Polygon", value: "polygon-mainnet" },
           { label: "Terra", value: "Terra" },
           { label: "Terra Classic", value: "Terra Classic" },
+          { label: "Stargaze", value: "Stargaze" },
         ],
       }),
     ],

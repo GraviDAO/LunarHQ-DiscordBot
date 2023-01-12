@@ -6,6 +6,10 @@
   return /^0x[a-fA-F0-9]{40}$/.test(address);
 };
 
+const isValidStargazeAddress = (address: string) => {
+  return /^stars[a-z0-9]{59}$/.test(address);
+};
+
 export const isValidAddress = (address: string, blockchainName: string) => {
   if(blockchainName === "Terra" || blockchainName === "Terra Classic")
   {
@@ -14,6 +18,10 @@ export const isValidAddress = (address: string, blockchainName: string) => {
   if(blockchainName === "polygon-mainnet")
   {
     return isValidEthereumAddress(address);
+  }
+  if(blockchainName === "Stargaze")
+  {
+    return isValidStargazeAddress(address);
   }
 
 }

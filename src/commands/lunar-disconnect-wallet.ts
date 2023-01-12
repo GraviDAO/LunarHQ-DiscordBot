@@ -36,6 +36,10 @@ export default {
               {
                 value: "polygon-mainnet",
                 name: "Polygon",
+              },
+              {
+                value: "Stargaze",
+                name: "Stargaze",
               }
             )
         ),
