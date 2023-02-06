@@ -1,6 +1,6 @@
 # Lunar Assistant Bot
 
-This repo contains the lunar assistant discord bot. See the guide here: https://guide.lunarassistant.com. It provides the following slash commands: 
+This repo contains the lunar assistant discord bot. See the guide here: https://gravidaopublic.notion.site/Lunar-HQ-Help-Centre-6ea23c8690794ad8bd021fe64eb49014. It provides the following slash commands: 
 ## Commands
 
 ### lunar-configure
@@ -25,17 +25,6 @@ Adds a rule for granting a role to users based on cw20 token ownership. When a u
 - role (required) : The role to give to users which meet this rule.
 - quantity (optional, 1 by default) : The quantity of cw20 tokens that a user must hold in order to meet the rule.
 
-#### add-api-rule
-
-Adds a rule for granting a role to users based on the response of the specified API. When a user's wallet meets the conditions of the rule, they will be granted the relevant role. Takes the following arguments:
-- api-url (required) : The URL of your custom API against which to check for permission.
-- role (required) : The role to give to users which meet this rule.
-
-Creating your custom API:
-- The url must contain $(wallet) which is an identifier that will be replaced by each user wallet at execution time. Example url: https://myApiUrl.com?walletAddress=$(wallet) 
-- The API must return its response (true or false) in the following format to be parsed correctly: {"allowed":true}
-
-
 #### view-rules
 
 View the rules currently configured for the server.
@@ -44,40 +33,6 @@ View the rules currently configured for the server.
 
 Remove a rule based on its index in the output of `/view-rules`. Takes the following arguments:
 - rule-number (required) : The index of the rule to remove.
-
-<!-- #### dependencies command group
-
-Command group for configuring role dependencies. Useful for making manually granted roles depend on wallet based roles (i.e., you can only be a galactic chairman if you hold at least 2 punks).
-
-##### add-role-dependency
-
-Add a relationship by which one role depends on another. Whenever the required role is removed from a user with the dependent role, the dependent role will be removed as well. Takes the following arguments:
-- required-role (required) : The role that is required in order to have the dependent role.
-- dependent-role (required) : The role that depends on the required role.
-##### view-role-dependencies
-
-View the rule dependencies currently configured for the server.
-
-##### remove-role-dependencies
-
-Remove a role dependency based on its index in the output of `/view-role-links`. Takes the following arguments:
-- rule-number (required) : The index of the role link to remove.
-
-#### alerts command group
-
-##### add-role-alert
-
-Add an alert that triggers whenever a given role is added or removed from a user. Takes the following arguments:
-- role (required) : The role to send an alert about whenever it is added or removed.
-
-##### view-role-alerts
-
-View the role alerts currently configured for the server.
-
-##### remove-role-alert
-
-Remove a role alert. Takes the following arguments:
-- role (required) : The role for which to remove an alert. -->
 
 
 ### lunar-link
@@ -103,7 +58,7 @@ Disconnects the user's discord account from their wallet address.
 
 ## Adding Lunar Assistant To Your Discord Server
 
-You can follow this link to add the Lunar Assistant bot to your discord server: https://discord.com/api/oauth2/authorize?client_id=973603855990411325&permissions=268435456&scope=applications.commands%20bot
+You can follow this link to add the Lunar Assistant bot to your discord server: https://discord.com/api/oauth2/authorize?client_id=1007464384492212254&permissions=309506165760&scope=applications.commands%20bot
 
 ## Roadmap
 
