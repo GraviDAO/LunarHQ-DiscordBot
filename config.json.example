@@ -1,8 +1,8 @@
 {
-  "token": "OTczNjAzODU1OTkwNDExMzI1.GA-4XD.9ugzpiS45q2TqPc3EEdNubwupR4RJhWvgbkAwo",
-  "clientId": "973603855990411325",
+  "token": "Paste the token of your discord bot here.",
+  "clientId": "Paste the id of your discord bot here.",
   "handle_interactions": true,
   "lunarHQ_url": "http://localhost:6060/",
   "WEBAPP_URL": "http://46.101.14.43/welcome",
-  "API_SECRET": "6qFnHTHJtTVkYuxhygklXtnQw38Qic3Z1simcfAPk0arOSlI6CFg1l0Rq9qgeCeQvpJwJn3Lr8foqf2w/dlUdUTWe1uD60rhV568562Y5zgMn1jThBGSV+ygCFKUZR2Hf6UjFGMEdGteDYxLnw4uhfezsQwjLlQVjva2Q/zUGuqiVWbuvj8G3pEDd1Gd+Fh0xm/SwUXpU2lVJH1kQ1qh16K6qgG7wek5pB9Vm5K5tH2BO71b+dcfhzxdP6V7tvuuZrRO9ZhQyRAsn4G1VNPhYeN9A7aCOkIHgJblxFIxVgP0nZfdxfUW1HbUspKspk1in2ktsfGM2ifrA2k73X86QQ=="
+  "API_SECRET": "Paste shared secret between backend and discord bot here"
 }
