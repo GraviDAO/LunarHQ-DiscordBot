@@ -21,7 +21,7 @@ export default {
           "The channel to send the panel to (defaults to current channel)"
         )
         .setRequired(false)
-        .addChannelTypes(ChannelType.GuildText)
+        .addChannelTypes(0) //ChannelType.GuildText
     ),
   execute: async (
     lunarAssistant: LunarAssistant,
