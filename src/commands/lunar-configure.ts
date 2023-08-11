@@ -184,6 +184,10 @@ export default {
               {
                 value: "polygon-mainnet",
                 name: "Polygon",
+              },
+              {
+                value: "Stargaze",
+                name: "Stargaze [No Token Support! Use NFT-Rules]",
               }
             )
         )
