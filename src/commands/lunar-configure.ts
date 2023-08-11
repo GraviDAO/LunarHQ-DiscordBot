@@ -14,7 +14,7 @@ import {
 import { isValidHttpUrl } from "../utils/helper";
 import { api } from "../services/api";
 import { isValidAddress } from "../utils/isValidAddress";
-const logger = require('../logging/logger');
+const logger = require("../logging/logger");
 
 export default {
   data: new SlashCommandBuilder()
@@ -81,7 +81,7 @@ export default {
               "A list of token ids that the rule is restricted to."
             )
         )
-    )/* disabled for now until correctly implemented on backend with event based design
+    ) /* disabled for now until correctly implemented on backend with event based design
     .addSubcommand((subcommand) =>
       subcommand
         .setName("add-staked-nft-rule")
@@ -155,13 +155,13 @@ export default {
       subcommand
         .setName("add-token-rule")
         .setDescription(
-          "Adds a rule for granting a role to users based on token ownership."
+          "Adds a rule for granting a role to users based on token/coin ownership."
         )
         .addStringOption((option) =>
           option
             .setName("token-address")
             .setDescription(
-              "The contract address against which to check for token ownership for this rule."
+              "The contract address against which to check for token/coin ownership for this rule."
             )
             .setRequired(true)
         )
@@ -184,10 +184,6 @@ export default {
               {
                 value: "polygon-mainnet",
                 name: "Polygon",
-              },
-              {
-                value: "Stargaze",
-                name: "Stargaze",
               }
             )
         )
@@ -204,7 +200,7 @@ export default {
               "The quantity of matching token tokens that a user must hold in order to meet the rule."
             )
         )
-    )/*
+    ) /*
     .addSubcommand((subcommand) =>
       subcommand
         .setName("add-api-rule")
@@ -311,22 +307,22 @@ export default {
         }
 
         // verify that we can parse tokenIds
-        try
-        {
-          if(rawTokenIds)
-          {
-            if(rawTokenIds.includes("[") || rawTokenIds.includes("]") || rawTokenIds.includes("'") || rawTokenIds.includes("\""))
-            {
+        try {
+          if (rawTokenIds) {
+            if (
+              rawTokenIds.includes("[") ||
+              rawTokenIds.includes("]") ||
+              rawTokenIds.includes("'") ||
+              rawTokenIds.includes('"')
+            ) {
               throw new Error(`Invalid character in tokenIds`);
             }
-            tokenIdArray = rawTokenIds.split(",").map(s => s.trim());
+            tokenIdArray = rawTokenIds.split(",").map((s) => s.trim());
           }
-        }
-        catch
-        {
+        } catch {
           await interaction.editReply({
             content:
-              'Could not parse token ids, please list token ids using a coma , to seperate values like so: 152, 19, 421',
+              "Could not parse token ids, please list token ids using a coma , to seperate values like so: 152, 19, 421",
           });
           return;
         }
@@ -349,7 +345,10 @@ export default {
           role: role.id,
           discordServerId: interaction.guild.id,
           blockchainName: blockchainName,
-          discordChannelId: typeof(interaction.channel?.id!) === "string"? interaction.channel?.id! : "",
+          discordChannelId:
+            typeof interaction.channel?.id! === "string"
+              ? interaction.channel?.id!
+              : "",
           discordMessageId: "",
         };
 
@@ -366,7 +365,8 @@ export default {
 
         // reply
         await interaction.editReply({
-          content: "Rule added successfully! Please note that it takes time for the system to index the collection if it is not already in the database. Expect about 1 hour per 10k tokens in the collection.",
+          content:
+            "Rule added successfully! Please note that it takes time for the system to index the collection if it is not already in the database. Expect about 1 hour per 10k tokens in the collection.",
         });
         break;
 
@@ -398,22 +398,22 @@ export default {
         }
 
         // verify that we can parse tokenIds
-        try
-        {
-          if(rawTokenIds)
-          {
-            if(rawTokenIds.includes("[") || rawTokenIds.includes("]") || rawTokenIds.includes("'") || rawTokenIds.includes("\""))
-            {
+        try {
+          if (rawTokenIds) {
+            if (
+              rawTokenIds.includes("[") ||
+              rawTokenIds.includes("]") ||
+              rawTokenIds.includes("'") ||
+              rawTokenIds.includes('"')
+            ) {
               throw new Error(`Invalid character in tokenIds`);
             }
-            tokenIdArray = rawTokenIds.split(",").map(s => s.trim());
+            tokenIdArray = rawTokenIds.split(",").map((s) => s.trim());
           }
-        }
-        catch
-        {
+        } catch {
           await interaction.editReply({
             content:
-              'Could not parse token ids, please list token ids using a coma , to seperate values like so: 152, 19, 421',
+              "Could not parse token ids, please list token ids using a coma , to seperate values like so: 152, 19, 421",
           });
           return;
         }
@@ -488,7 +488,10 @@ export default {
           quantity: rawQuantity,
           quantityOperatorName: "Greater Than Or Equals",
           role: role.id,
-          discordChannelId: typeof(interaction.channel?.id!) === "string"? interaction.channel?.id! : "",
+          discordChannelId:
+            typeof interaction.channel?.id! === "string"
+              ? interaction.channel?.id!
+              : "",
           discordServerId: interaction.guild.id,
         };
 
