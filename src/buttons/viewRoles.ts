@@ -4,6 +4,7 @@ import { api } from "../services/api";
 const logger = require("../logging/logger");
 
 export default {
+  /*
   customId: "viewRoles",
   execute: async (
     lunarAssistant: LunarAssistant,
@@ -16,6 +17,7 @@ export default {
     await interaction.deferReply({ ephemeral: true });
 
     try {
+      
       const guild = lunarAssistant.client.guilds.cache.get(interaction.guildId);
       if (!guild) return;
 
@@ -46,6 +48,7 @@ export default {
 
       const message = `Hello ser! You currently have the following roles on this discord server:\n\n${activeRolesMessage}\n\nBuilt by GraviDAO`;
 
+const message = `This feature has been temporarily disabled due to a bug. We are actively working on a fix.`
       if (message.length > 2000) {
         await interaction.editReply({
           content:
@@ -69,5 +72,5 @@ export default {
         content: "There was an unknown error while executing this command!",
       });
     }
-  },
+  },*/
 };

@@ -40,6 +40,10 @@ export default {
               {
                 value: "Stargaze",
                 name: "Stargaze",
+              },
+              {
+                value: "Archway",
+                name: "Archway",
               }
             )
         ),

@@ -65,6 +65,7 @@ export function blockchainNameChoices() {
           { label: "Terra", value: "Terra" },
           { label: "Terra Classic", value: "Terra Classic" },
           { label: "Stargaze", value: "Stargaze" },
+          { label: "Archway", value: "Archway" },
         ],
       }),
     ],

@@ -10,6 +10,10 @@ const isValidStargazeAddress = (address: string) => {
   return /^stars[a-z0-9]{59}$/.test(address);
 };
 
+const isValidArchwayAddress = (address: string) => {
+  return /(archway(valoper)?1([a-z0-9]{38}))/g.test(address);
+};
+
 export const isValidAddress = (address: string, blockchainName: string) => {
   if(blockchainName === "Terra" || blockchainName === "Terra Classic")
   {
@@ -23,5 +27,10 @@ export const isValidAddress = (address: string, blockchainName: string) => {
   {
     return isValidStargazeAddress(address);
   }
+  if(blockchainName === "Archway")
+  {
+    return isValidArchwayAddress(address);
+  }
 
 }
+//archway10425flc7vh9pvzjcjkhs938j74llgv40fyscus

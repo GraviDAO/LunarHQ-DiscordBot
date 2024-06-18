@@ -58,6 +58,10 @@ export default {
               {
                 value: "Stargaze",
                 name: "Stargaze",
+              },
+              {
+                value: "Archway",
+                name: "Archway",
               }
             )
         )
@@ -127,6 +131,10 @@ export default {
               {
                 value: "Stargaze",
                 name: "Stargaze",
+              },
+              {
+                value: "Archway",
+                name: "Archway",
               }
             )
         )
@@ -188,6 +196,10 @@ export default {
               {
                 value: "Stargaze",
                 name: "Stargaze [No Token Support! Use NFT-Rules]",
+              },
+              {
+                value: "Archway",
+                name: "Archway",
               }
             )
         )
@@ -242,6 +254,10 @@ export default {
               {
                 value: "Stargaze",
                 name: "Stargaze",
+              },
+              {
+                value: "Archway",
+                name: "Archway",
               }
             )
         )
