@@ -3,6 +3,7 @@ import { handle_interactions, token } from "../config.json";
 import { interactionHandler } from "./utils/interactionHandler";
 import { registerCommands } from "./utils/registerCommands";
 import { StartListener } from "./listener/eventListener";
+import { dependencies } from "../package.json";
 const logger = require('./logging/logger');
 
 export class LunarAssistant {
@@ -38,6 +39,9 @@ export class LunarAssistant {
       this.registerGuildCommands();
 
       StartListener(this);
+
+      const discordJSVersion = dependencies["discord.js"];
+      console.log("DiscordJS version:" + discordJSVersion);
 
       // Call the passed onReady function
       onReady(this);
