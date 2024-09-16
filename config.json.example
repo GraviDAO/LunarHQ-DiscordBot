@@ -4,5 +4,9 @@
   "handle_interactions": true,
   "lunarHQ_url": "http://localhost:6060/",
   "WEBAPP_URL": "http://46.101.14.43/welcome",
-  "API_SECRET": "Paste shared secret between backend and discord bot here"
+  "API_SECRET": "Paste shared secret between backend and discord bot here",
+  "publicInfo": {
+    "website": "https://lunar-hq.io/",
+    "socials": "https://linktr.ee/gravidao"
+  }
 }

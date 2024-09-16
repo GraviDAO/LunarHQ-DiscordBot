@@ -2,10 +2,9 @@ import {
   ActionRowBuilder,
   ButtonBuilder,
   ButtonStyle,
-  ComponentType,
   SelectMenuBuilder,
 } from "discord.js";
-import { WEBAPP_URL } from "../../config.json";
+import { WEBAPP_URL, publicInfo } from "../../config.json";
 
 export function castProposalVoteButtons(enabled: boolean = true) {
   return new ActionRowBuilder<ButtonBuilder>({
@@ -86,12 +85,12 @@ export function lunarAssistantPanelButtons() {
         style: ButtonStyle.Secondary,
       }),
       new ButtonBuilder({
-        url: "https://lunarassistant.io/",
+        url: publicInfo.website,
         label: "Website",
         style: ButtonStyle.Link,
       }),
       new ButtonBuilder({
-        url: "https://linktr.ee/gravidao",
+        url: publicInfo.socials,
         label: "Socials",
         style: ButtonStyle.Link,
       }),
