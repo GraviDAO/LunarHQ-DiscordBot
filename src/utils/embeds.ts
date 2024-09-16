@@ -1,10 +1,5 @@
-import { Colors, EmbedBuilder, Formatters, time, User } from "discord.js";
-import {
-  CreateProposal,
-  Proposal,
-  ProposalChoice,
-  Poll,
-} from "../shared/apiTypes";
+import { Colors, EmbedBuilder, time, User, userMention } from "discord.js";
+import { Poll, Proposal, ProposalChoice } from "../shared/apiTypes";
 import { toPascalCase } from "./helper";
 
 export function primaryEmbed(
@@ -135,9 +130,7 @@ export function pollsEmbed(polls: Poll[]) {
     fields: polls.map((p: Poll) => {
       return {
         name: p.title,
-        value: `__Creator:__ ${Formatters.userMention(p.creator)}(${
-          p.creator
-        })\n${
+        value: `__Creator:__ ${userMention(p.creator)}(${p.creator})\n${
           p.votes.yes.length + p.votes.no.length + p.votes.abstain.length ?? 0
         } votes`,
       };
@@ -154,7 +147,7 @@ export function proposalsEmbed(proposals: Proposal[]) {
     fields: proposals.map((p: Proposal) => {
       return {
         name: p.title,
-        value: `__Creator:__ ${Formatters.userMention(p.creatorDiscordId)}(${
+        value: `__Creator:__ ${userMention(p.creatorDiscordId)}(${
           p.creatorDiscordId
         })\n`,
       };
