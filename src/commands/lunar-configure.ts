@@ -1,10 +1,7 @@
 import { SlashCommandBuilder } from "@discordjs/builders";
-import {
-  Attachment,
-  AttachmentBuilder,
-  ChatInputCommandInteraction,
-} from "discord.js";
+import { AttachmentBuilder, ChatInputCommandInteraction } from "discord.js";
 import { LunarAssistant } from "..";
+import { api } from "../services/api";
 import {
   apiRuleData,
   nftRuleData,
@@ -12,7 +9,6 @@ import {
   tokenRuleData,
 } from "../shared/apiTypes";
 import { isValidHttpUrl } from "../utils/helper";
-import { api } from "../services/api";
 import { isValidAddress } from "../utils/isValidAddress";
 const logger = require("../logging/logger");
 
@@ -185,10 +181,10 @@ export default {
                 value: "Terra",
                 name: "Terra",
               },
-              {
-                value: "Terra Classic",
-                name: "Terra Classic",
-              },
+              // {
+              //   value: "Terra Classic",
+              //   name: "Terra Classic",
+              // },
               {
                 value: "polygon-mainnet",
                 name: "Polygon",
@@ -200,6 +196,26 @@ export default {
               {
                 value: "Archway",
                 name: "Archway",
+              },
+              {
+                value: "Juno",
+                name: "Juno",
+              },
+              {
+                value: "Osmosis",
+                name: "Osmosis",
+              },
+              {
+                value: "Neutron",
+                name: "Neutron",
+              },
+              {
+                value: "Injective",
+                name: "Injective",
+              },
+              {
+                value: "Migaloo",
+                name: "Migaloo",
               }
             )
         )
