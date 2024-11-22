@@ -41,10 +41,30 @@ export default {
                 value: "Stargaze",
                 name: "Stargaze",
               },
+              // {
+              //   value: "Archway",
+              //   name: "Archway",
+              // },
+              // {
+              //   value: "Juno",
+              //   name: "Juno",
+              // },
+              // {
+              //   value: "Osmosis",
+              //   name: "Osmosis",
+              // },
+              // {
+              //   value: "Neutron",
+              //   name: "Neutron",
+              // },
               {
-                value: "Archway",
-                name: "Archway",
-              }
+                value: "Injective",
+                name: "Injective",
+              },
+              // {
+              //   value: "Migaloo",
+              //   name: "Migaloo",
+              // }
             )
         ),
   execute: async (
