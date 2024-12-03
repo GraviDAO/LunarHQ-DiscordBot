@@ -3,6 +3,7 @@ import {
   SlashCommandBuilder,
 } from "@discordjs/builders";
 import {
+  AutocompleteInteraction,
   ButtonInteraction,
   CommandInteraction,
   ContextMenuCommandInteraction,
@@ -15,6 +16,10 @@ export interface SlashCommandData {
   execute: (
     lunarAssistant: LunarAssistant,
     interaction: CommandInteraction
+  ) => Promise<void>;
+  autocomplete?: (
+    lunarAssistant: LunarAssistant,
+    interaction: AutocompleteInteraction
   ) => Promise<void>;
 }
 
@@ -41,4 +46,3 @@ export interface ModalData {
     interaction: ModalSubmitInteraction
   ) => Promise<void>;
 }
-

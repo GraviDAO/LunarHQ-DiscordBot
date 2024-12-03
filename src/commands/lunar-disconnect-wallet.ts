@@ -1,72 +1,35 @@
 import { SlashCommandBuilder } from "@discordjs/builders";
 import { ChatInputCommandInteraction } from "discord.js";
 import { LunarAssistant } from "..";
+import chains from "../../blockchains.json";
 import { api } from "../services/api";
 import { AccountWallet } from "../shared/apiTypes";
-const logger = require('../logging/logger');
+const logger = require("../logging/logger");
 
 export default {
   data: new SlashCommandBuilder()
     .setName("lunar-disconnect-wallet")
     .setDescription("Disconnect a wallet linked to your discord account.")
     .addStringOption((option) =>
-          option
-            .setName("wallet-address")
-            .setDescription(
-              "The wallet address to unlink from your account"
-            )
-            .setRequired(true)
+      option
+        .setName("wallet-address")
+        .setDescription("The wallet address to unlink from your account")
+        .setRequired(true)
+    )
+    .addStringOption((option) =>
+      option
+        .setName("blockchain")
+        .setDescription("The blockchain name to which the nft-address belongs.")
+        .setRequired(true)
+        .addChoices(
+          ...Object.values(chains)
+            .filter((chain) => chain.enabled)
+            .map((chain) => ({
+              name: chain.name,
+              value: chain.name,
+            }))
         )
-        .addStringOption((option) =>
-          option
-            .setName("blockchain")
-            .setDescription(
-              "The blockchain name to which the nft-address belongs."
-            )
-            .setRequired(true)
-            .addChoices(
-              {
-                value: "Terra",
-                name: "Terra",
-              },
-              {
-                value: "Terra Classic",
-                name: "Terra Classic",
-              },
-              {
-                value: "polygon-mainnet",
-                name: "Polygon",
-              },
-              {
-                value: "Stargaze",
-                name: "Stargaze",
-              },
-              // {
-              //   value: "Archway",
-              //   name: "Archway",
-              // },
-              // {
-              //   value: "Juno",
-              //   name: "Juno",
-              // },
-              // {
-              //   value: "Osmosis",
-              //   name: "Osmosis",
-              // },
-              // {
-              //   value: "Neutron",
-              //   name: "Neutron",
-              // },
-              {
-                value: "Injective",
-                name: "Injective",
-              },
-              // {
-              //   value: "Migaloo",
-              //   name: "Migaloo",
-              // }
-            )
-        ),
+    ),
   execute: async (
     lunarAssistant: LunarAssistant,
     interaction: ChatInputCommandInteraction

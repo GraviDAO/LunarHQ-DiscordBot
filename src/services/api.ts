@@ -1,7 +1,8 @@
 import axios, { AxiosRequestConfig, AxiosResponse } from "axios";
-import { lunarHQ_url, API_SECRET } from "../../config.json";
 import jwt from "jsonwebtoken";
+import { API_SECRET, lunarHQ_url } from "../../config.json";
 import {
+  AbstractCollection,
   apiRuleData,
   CreateProposal,
   CreateProposalAddMsgId,
@@ -9,6 +10,7 @@ import {
   GetProposalsResponse,
   GetRulesResponse,
   GetUsersWalletsResponse,
+  IndexedCollection,
   nftRuleData,
   Proposal,
   stakedNftRuleData,
@@ -29,6 +31,24 @@ class API {
   constructor(params?: apiParams) {
     this.apiBaseUrl = params?.baseUrl ?? this.apiBaseUrl;
     this.apiToken = params?.token ?? this.apiToken;
+  }
+
+  async getAllAbstractCollections(): Promise<AbstractCollection[]> {
+    return (
+      await this.get(
+        "abstractCollection/all",
+        this.config(this.sign(undefined, ["getAbstractCollections"]))
+      )
+    ).data;
+  }
+
+  async getIndexedCollections(): Promise<IndexedCollection[]> {
+    return (
+      await this.get(
+        "indexedCollections",
+        this.config(this.sign(undefined, ["getIndexedCollections"]))
+      )
+    ).data;
   }
 
   async getNftRules(guildId: string): Promise<GetRulesResponse> {
@@ -103,7 +123,10 @@ class API {
     ).data.message;
   }
 
-  async createProposalAddMsgId(discordServerId: string, data: CreateProposalAddMsgId): Promise<Proposal> {
+  async createProposalAddMsgId(
+    discordServerId: string,
+    data: CreateProposalAddMsgId
+  ): Promise<Proposal> {
     return (
       await this.post(
         "createProposal",
@@ -205,11 +228,7 @@ class API {
     ).data;
   }
 
-  async resetVote(
-    guildId: string,
-    userId: string,
-    messageId: string
-  ) {
+  async resetVote(guildId: string, userId: string, messageId: string) {
     return (
       await this.put(
         "resetVote",
@@ -238,8 +257,7 @@ class API {
     return (
       await this.put(
         "unlinkWallet",
-        this.config(this.sign(undefined, ["unlinkWallet"]),
-        {
+        this.config(this.sign(undefined, ["unlinkWallet"]), {
           discordUserId: userId,
           address: address,
           blockchainName: blockchainName,

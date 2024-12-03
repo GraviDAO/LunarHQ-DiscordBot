@@ -1,10 +1,12 @@
 import { Client, IntentsBitField } from "discord.js";
 import { handle_interactions, token } from "../config.json";
+import { dependencies } from "../package.json";
+import { StartListener } from "./listener/eventListener";
+import { api } from "./services/api";
+import repository from "./services/repository";
 import { interactionHandler } from "./utils/interactionHandler";
 import { registerCommands } from "./utils/registerCommands";
-import { StartListener } from "./listener/eventListener";
-import { dependencies } from "../package.json";
-const logger = require('./logging/logger');
+const logger = require("./logging/logger");
 
 export class LunarAssistant {
   client: Client;
@@ -71,6 +73,11 @@ export class LunarAssistant {
 const lunarAssistantBot = new LunarAssistant();
 
 // start the lunar assistant bot
-lunarAssistantBot.start(() => {
+lunarAssistantBot.start(async () => {
+  repository.saveCollections({
+    abstractCollections: await api.getAllAbstractCollections(),
+    indexedCollections: await api.getIndexedCollections(),
+  });
+  console.log(repository.indexedCollections.slice(0, 5));
   logger.info("Ready!");
 }, handle_interactions);

@@ -25,7 +25,7 @@ export interface GenericRule {
   blockchainName: string;
   address: string;
   quantity: number | null;
-  quantityOperatorName: string,
+  quantityOperatorName: string;
   role: string;
   tokenIds: string[] | null;
   apiUrl: string;
@@ -40,7 +40,7 @@ export interface nftRuleData {
   nftAddress: string;
   tokenIds: string[];
   quantity: number;
-  quantityOperatorName: string,
+  quantityOperatorName: string;
   role: string;
   discordServerId: string;
   blockchainName: string;
@@ -53,7 +53,7 @@ export interface stakedNftRuleData {
   stakedNftAddress: string;
   tokenIds: string[];
   quantity: number;
-  quantityOperatorName: string,
+  quantityOperatorName: string;
   role: string;
   discordServerId: string;
   blockchainName: string;
@@ -62,7 +62,7 @@ export interface stakedNftRuleData {
 export interface tokenRuleData {
   tokenAddress: string;
   quantity: number;
-  quantityOperatorName: string,
+  quantityOperatorName: string;
   role: string;
   discordServerId: string;
   discordChannelId: string;
@@ -77,25 +77,25 @@ export interface apiRuleData {
 }
 
 export interface CreateProposal {
-  title: string,
-    description: string,
-    address: string,
-    votingSystem: string,
-    creatorDiscordId: string,
-    quorum: string,
-    discordServerId: string,
-    blockchainName: string,
-    discordMessageId?: string,
-    discordChannelId: string,
-    numberPerVote: number,
-    startDate: Date,
-    endDate: Date,
-    ruleIds: string[]
+  title: string;
+  description: string;
+  address: string;
+  votingSystem: string;
+  creatorDiscordId: string;
+  quorum: string;
+  discordServerId: string;
+  blockchainName: string;
+  discordMessageId?: string;
+  discordChannelId: string;
+  numberPerVote: number;
+  startDate: Date;
+  endDate: Date;
+  ruleIds: string[];
 }
 
 export interface CreateProposalAddMsgId {
-  proposalId: number,
-  discordMessageId: string,
+  proposalId: number;
+  discordMessageId: string;
 }
 
 export interface Proposal {
@@ -164,9 +164,39 @@ export interface Poll {
     yes: string[];
     no: string[];
     abstain: string[];
-  }
-  results?: PollResults | null,
+  };
+  results?: PollResults | null;
   contractAddress: string;
   messageId?: string;
   channelId?: string;
+}
+
+export interface IndexedCollection {
+  name: string;
+  address: string;
+  symbol: string;
+  blockchain: Blockchain;
+}
+
+export interface Blockchain {
+  name: string;
+  chainId: string;
+}
+
+export interface AbstractCollection {
+  chainName: string;
+  chainId: string;
+  collections: FullAbstractCollection[];
+}
+
+export interface FullAbstractCollection {
+  name: string;
+  symbol: string;
+  address: string;
+  supply: number;
+  homeCollection: boolean;
+  admin: string;
+  creator: string;
+  minter: string;
+  codeId: number;
 }

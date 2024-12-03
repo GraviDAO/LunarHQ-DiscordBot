@@ -1,14 +1,21 @@
 import { SlashCommandBuilder } from "@discordjs/builders";
-import { AttachmentBuilder, ChatInputCommandInteraction } from "discord.js";
+import {
+  AttachmentBuilder,
+  AutocompleteInteraction,
+  ChatInputCommandInteraction,
+} from "discord.js";
 import { LunarAssistant } from "..";
+import chains from "../../blockchains.json";
 import { api } from "../services/api";
+import repository from "../services/repository";
 import {
   apiRuleData,
   nftRuleData,
   stakedNftRuleData,
   tokenRuleData,
 } from "../shared/apiTypes";
-import { isValidHttpUrl } from "../utils/helper";
+import { isValidHttpUrl, shuffleArray } from "../utils/helper";
+import { isBlockchainEnabled } from "../utils/isBlockchainEnabled";
 import { isValidAddress } from "../utils/isValidAddress";
 const logger = require("../logging/logger");
 
@@ -25,61 +32,30 @@ export default {
         )
         .addStringOption((option) =>
           option
-            .setName("nft-address")
-            .setDescription(
-              "The contract address against which to check for nft ownership for this rule."
-            )
-            .setRequired(true)
-        )
-        .addStringOption((option) =>
-          option
             .setName("blockchain")
             .setDescription(
               "The blockchain name to which the nft-address belongs."
             )
             .setRequired(true)
             .addChoices(
-              {
-                value: "Terra",
-                name: "Terra",
-              },
-              {
-                value: "Terra Classic",
-                name: "Terra Classic",
-              },
-              {
-                value: "polygon-mainnet",
-                name: "Polygon",
-              },
-              {
-                value: "Stargaze",
-                name: "Stargaze",
-              },
-              // {
-              //   value: "Archway",
-              //   name: "Archway",
-              // },
-              // {
-              //   value: "Juno",
-              //   name: "Juno",
-              // },
-              // {
-              //   value: "Osmosis",
-              //   name: "Osmosis",
-              // },
-              // {
-              //   value: "Neutron",
-              //   name: "Neutron",
-              // },
-              {
-                value: "Injective",
-                name: "Injective",
-              },
-              // {
-              //   value: "Migaloo",
-              //   name: "Migaloo",
-              // }
+              ...Object.entries(chains)
+                .filter(([_, value]) => value.enabled && value.support.nftRule)
+                .map(([_, value]) => {
+                  return {
+                    name: value.name,
+                    value: value.value,
+                  };
+                })
             )
+        )
+        .addStringOption((option) =>
+          option
+            .setName("nft-address")
+            .setDescription(
+              "The contract address against which to check for nft ownership for this rule."
+            )
+            .setRequired(true)
+            .setAutocomplete(true)
         )
         .addRoleOption((option) =>
           option
@@ -203,61 +179,34 @@ export default {
         )
         .addStringOption((option) =>
           option
-            .setName("token-address")
-            .setDescription(
-              "The contract address against which to check for token/coin ownership for this rule."
-            )
-            .setRequired(true)
-        )
-        .addStringOption((option) =>
-          option
             .setName("blockchain")
             .setDescription(
               "The blockchain name to which the nft-address belongs."
             )
             .setRequired(true)
             .addChoices(
-              {
-                value: "Terra",
-                name: "Terra",
-              },
-              // {
-              //   value: "Terra Classic",
-              //   name: "Terra Classic",
-              // },
-              {
-                value: "polygon-mainnet",
-                name: "Polygon",
-              },
-              {
-                value: "Stargaze",
-                name: "Stargaze [No Token Support! Use NFT-Rules]",
-              },
-              // {
-              //   value: "Archway",
-              //   name: "Archway",
-              // },
-              // {
-              //   value: "Juno",
-              //   name: "Juno",
-              // },
-              // {
-              //   value: "Osmosis",
-              //   name: "Osmosis",
-              // },
-              // {
-              //   value: "Neutron",
-              //   name: "Neutron",
-              // },
-              {
-                value: "Injective",
-                name: "Injective",
-              },
-              // {
-              //   value: "Migaloo",
-              //   name: "Migaloo",
-              // }
+              ...Object.values(chains)
+                .filter((value) => value.enabled)
+                .map((value) => {
+                  return {
+                    name:
+                      value.name +
+                      (value.support.nftRule && !value.support.tokenRule
+                        ? " [No Token Support! Use NFT-Rules]"
+                        : ""),
+                    value: value.value,
+                  };
+                })
             )
+        )
+        .addStringOption((option) =>
+          option
+            .setName("token-address")
+            .setDescription(
+              "The contract address against which to check for token/coin ownership for this rule."
+            )
+            .setRequired(true)
+            .setAutocomplete(true)
         )
         .addRoleOption((option) =>
           option
@@ -375,6 +324,13 @@ export default {
         rawQuantity = interaction.options.getNumber("quantity") ?? 1;
         rawTokenIds = interaction.options.getString("token-ids");
 
+        if (!isBlockchainEnabled(blockchainName, "nftRule")) {
+          await interaction.editReply({
+            content: "NFT rules are not supported on this blockchain.",
+          });
+          return;
+        }
+
         if (!isValidAddress(nftAddress, blockchainName)) {
           await interaction.editReply({
             content: "Invalid address",
@@ -458,6 +414,13 @@ export default {
         role = interaction.options.getRole("role", true);
         rawQuantity = interaction.options.getNumber("quantity") ?? 1;
         rawTokenIds = interaction.options.getString("token-ids");
+
+        if (!isBlockchainEnabled(blockchainName, "tokenRule")) {
+          await interaction.editReply({
+            content: "Token Rules are not supported on this blockchain.",
+          });
+          return;
+        }
 
         if (!isValidAddress(nftAddress, blockchainName)) {
           await interaction.editReply({
@@ -704,6 +667,36 @@ export default {
           content: "Rule removed successfully!",
         });
         break;
+    }
+  },
+  autocomplete: async (
+    lunarAssistant: LunarAssistant,
+    interaction: AutocompleteInteraction
+  ) => {
+    const focused = interaction.options.getFocused(true);
+    if (["token-address", "nft-address"].includes(focused.name)) {
+      const blockchainName = interaction.options.getString("blockchain", true);
+      const tokenAddress = focused.value;
+
+      const filtered = repository
+        .getIndexCollectionByChain(blockchainName)
+        .filter(
+          (c) =>
+            tokenAddress === "" ||
+            c.address.toLowerCase().includes(tokenAddress.toLowerCase()) ||
+            c.name.toLowerCase().includes(tokenAddress.toLowerCase())
+        );
+
+      const shuffledArray = shuffleArray(filtered).slice(0, 10);
+
+      interaction.respond(
+        shuffledArray.map((c) => ({
+          name: `${c.name} - (${c.address.slice(0, 6)}...${c.address.slice(
+            -4
+          )})`,
+          value: c.address,
+        }))
+      );
     }
   },
 };

@@ -4,6 +4,7 @@ import {
   ButtonStyle,
   SelectMenuBuilder,
 } from "discord.js";
+import chains from "../../blockchains.json";
 import { WEBAPP_URL, publicInfo } from "../../config.json";
 
 export function castProposalVoteButtons(enabled: boolean = true) {
@@ -59,18 +60,12 @@ export function blockchainNameChoices() {
     components: [
       new SelectMenuBuilder({
         customId: "blockchainPicker",
-        options: [
-          { label: "Polygon", value: "polygon-mainnet" },
-          { label: "Terra", value: "Terra" },
-          { label: "Terra Classic", value: "Terra Classic" },
-          { label: "Stargaze", value: "Stargaze" },
-          // { label: "Archway", value: "Archway" },
-          // { label: "Juno", value: "Juno" },
-          // { label: "Osmosis", value: "Osmosis" },
-          // { label: "Migaloo", value: "Migaloo" },
-          { label: "Injective", value: "Injective" },
-          // { label: "Neutron", value: "Neutron" },
-        ],
+        options: Object.values(chains)
+          .filter((chain) => chain.enabled)
+          .map((chain) => ({
+            label: chain.name,
+            value: chain.value,
+          })),
       }),
     ],
   });

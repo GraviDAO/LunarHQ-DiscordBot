@@ -1,0 +1,102 @@
+{
+  "terra": {
+    "value": "Terra",
+    "name": "Terra",
+    "chainId": "phoenix-1",
+    "enabled": true,
+    "support": {
+      "nftRule": true,
+      "tokenRule": true
+    }
+  },
+  "terraClassic": {
+    "value": "Terra Classic",
+    "name": "Terra Classic",
+    "chainId": "columbus-5",
+    "enabled": true,
+    "support": {
+      "nftRule": true,
+      "tokenRule": false
+    }
+  },
+  "polygon": {
+    "value": "polygon-mainnet",
+    "name": "Polygon",
+    "chainId": "137",
+    "enabled": true,
+    "support": {
+      "nftRule": true,
+      "tokenRule": true
+    }
+  },
+  "stargaze": {
+    "value": "Stargaze",
+    "name": "Stargaze",
+    "chainId": "stargaze-1",
+    "enabled": true,
+    "support": {
+      "nftRule": true,
+      "tokenRule": false
+    }
+  },
+  "archway": {
+    "value": "Archway",
+    "name": "Archway",
+    "chainId": "archway-1",
+    "enabled": false,
+    "support": {
+      "nftRule": true,
+      "tokenRule": true
+    }
+  },
+  "juno": {
+    "value": "Juno",
+    "name": "Juno",
+    "chainId": "juno-1",
+    "enabled": false,
+    "support": {
+      "nftRule": true,
+      "tokenRule": true
+    }
+  },
+  "osmosis": {
+    "value": "Osmosis",
+    "name": "Osmosis",
+    "chainId": "osmosis-1",
+    "enabled": false,
+    "support": {
+      "nftRule": true,
+      "tokenRule": true
+    }
+  },
+  "neutron": {
+    "value": "Neutron",
+    "name": "Neutron",
+    "chainId": "neutron-1",
+    "enabled": false,
+    "support": {
+      "nftRule": true,
+      "tokenRule": true
+    }
+  },
+  "injective": {
+    "value": "Injective",
+    "name": "Injective",
+    "chainId": "injective-1",
+    "enabled": true,
+    "support": {
+      "nftRule": true,
+      "tokenRule": true
+    }
+  },
+  "migaloo": {
+    "value": "Migaloo",
+    "name": "Migaloo",
+    "chainId": "migaloo-1",
+    "enabled": false,
+    "support": {
+      "nftRule": true,
+      "tokenRule": true
+    }
+  }
+}

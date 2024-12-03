@@ -12,11 +12,11 @@ import {
   ModalData,
   SlashCommandData,
 } from "../types";
-import { commandFiles } from "./commandFiles";
 import { buttonFiles } from "./buttonFiles";
+import { commandFiles } from "./commandFiles";
 import { contextMenuFiles } from "./contextMenuFiles";
 import { modalFiles } from "./modalFiles";
-const logger = require('../logging/logger');
+const logger = require("../logging/logger");
 
 // Create a collection for the command handles
 const commandHandlers = new Collection<string, SlashCommandData>();
@@ -79,6 +79,7 @@ export async function interactionHandler(
       InteractionType.ApplicationCommand,
       InteractionType.ModalSubmit,
       InteractionType.MessageComponent,
+      InteractionType.ApplicationCommandAutocomplete,
     ].includes(interaction.type)
   )
     return;
@@ -103,6 +104,17 @@ export async function interactionHandler(
         content: "There was an error while executing this command!",
         ephemeral: true,
       });
+    }
+  }
+  if (interaction.isAutocomplete()) {
+    const autocomplete = commandHandlers.get(interaction.commandName);
+    if (!autocomplete || !autocomplete.autocomplete) return;
+
+    // try to run the autocomplete handler
+    try {
+      await autocomplete.autocomplete(this, interaction);
+    } catch (error) {
+      logger.error(error);
     }
   }
   if (interaction.isButton()) {
