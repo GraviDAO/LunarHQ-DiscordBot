@@ -239,7 +239,7 @@ export function createComplexRuleEmbed(data: {
                 ])}\n${italic("Examples:")}\n${codeBlock(
                   "N-1 && N-2 || N-3"
                 )}${codeBlock("T-1 || T-2")}${codeBlock(
-                  "N-1 && T-1 || N-2"
+                  "N-1 && (T-1 || N-2)"
                 )}\nYou can use ${inlineCode("&&")}, ${inlineCode(
                   "||"
                 )} operators to combine rules and parentheses ${inlineCode(
