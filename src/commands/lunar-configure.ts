@@ -1,8 +1,11 @@
 import { SlashCommandBuilder } from "@discordjs/builders";
 import {
+  APIRole,
   AttachmentBuilder,
   AutocompleteInteraction,
+  ButtonInteraction,
   ChatInputCommandInteraction,
+  Role,
 } from "discord.js";
 import { LunarAssistant } from "..";
 import chains from "../../blockchains.json";
@@ -10,13 +13,22 @@ import { api } from "../services/api";
 import repository from "../services/repository";
 import {
   apiRuleData,
+  GenericRule,
   nftRuleData,
   stakedNftRuleData,
   tokenRuleData,
 } from "../shared/apiTypes";
-import { isValidHttpUrl, shuffleArray } from "../utils/helper";
+import { ComplexRuleMode } from "../types";
+import { createComplexRuleButtons } from "../utils/buttons";
+import { createComplexRuleEmbed } from "../utils/embeds";
+import {
+  generateExpression,
+  isValidHttpUrl,
+  shuffleArray,
+} from "../utils/helper";
 import { isBlockchainEnabled } from "../utils/isBlockchainEnabled";
 import { isValidAddress } from "../utils/isValidAddress";
+import { customExpressionModal } from "../utils/modals";
 const logger = require("../logging/logger");
 
 export default {
@@ -275,6 +287,19 @@ export default {
     )*/
     .addSubcommand((subcommand) =>
       subcommand
+        .setName("add-complex-rule")
+        .setDescription(
+          "Adds a complex rule for granting a role to users based on multiple conditions."
+        )
+        .addRoleOption((option) =>
+          option
+            .setName("role")
+            .setDescription("The role to give to users which meet this rule.")
+            .setRequired(true)
+        )
+    )
+    .addSubcommand((subcommand) =>
+      subcommand
         .setName("view-rules")
         .setDescription("View the rules currently configured for the server.")
     )
@@ -301,16 +326,15 @@ export default {
 
     await interaction.deferReply({ ephemeral: true });
 
-    let nftAddress;
-    let stakedNftAddress;
-    let blockchainName;
-    let role;
-    let rawQuantity;
-    let rawTokenIds;
-    let tokenAddress;
-    let apiUrl;
-    let ruleNumber;
-    let tokenIds;
+    let nftAddress: string;
+    let stakedNftAddress: string;
+    let blockchainName: string;
+    let role: Role | APIRole;
+    let rawQuantity: number;
+    let rawTokenIds: string | undefined;
+    let tokenAddress: string;
+    let apiUrl: string;
+    let ruleNumber: string;
     let tokenIdArray: string[] = [];
 
     switch (interaction.options.getSubcommand(true)) {
@@ -322,7 +346,7 @@ export default {
         blockchainName = interaction.options.getString("blockchain", true);
         role = interaction.options.getRole("role", true);
         rawQuantity = interaction.options.getNumber("quantity") ?? 1;
-        rawTokenIds = interaction.options.getString("token-ids");
+        rawTokenIds = interaction.options.getString("token-ids") ?? undefined;
 
         if (!isBlockchainEnabled(blockchainName, "nftRule")) {
           await interaction.editReply({
@@ -413,7 +437,7 @@ export default {
         blockchainName = interaction.options.getString("blockchain", true);
         role = interaction.options.getRole("role", true);
         rawQuantity = interaction.options.getNumber("quantity") ?? 1;
-        rawTokenIds = interaction.options.getString("token-ids");
+        rawTokenIds = interaction.options.getString("token-ids") ?? undefined;
 
         if (!isBlockchainEnabled(blockchainName, "tokenRule")) {
           await interaction.editReply({
@@ -599,10 +623,173 @@ export default {
         });
         break;
 
+      case "add-complex-rule":
+        role = interaction.options.getRole("role", true);
+
+        let allRules: GenericRule[];
+        try {
+          allRules = (await api.getRules(interaction.guildId)).rules;
+        } catch (e) {
+          logger.error(e);
+          await interaction.editReply({
+            content:
+              "Could not get rules for this server, please try again later.",
+          });
+          return;
+        }
+
+        let expression: string | undefined = "";
+        let mode: ComplexRuleMode = "&&";
+        let phase: number = 0;
+        let ruleIds: string[] = [];
+        await interaction.editReply({
+          embeds: [
+            createComplexRuleEmbed({
+              role,
+              rules: allRules,
+              selected: ruleIds,
+              phase,
+              expression: generateExpression(ruleIds, mode, expression),
+            }),
+          ],
+          components: createComplexRuleButtons(phase, allRules, ruleIds),
+        });
+
+        const collector = interaction.channel?.createMessageComponentCollector({
+          time: 150000,
+          filter: (i) =>
+            i.customId.startsWith("cr.") && i.user.id === interaction.user.id,
+        });
+
+        collector?.on("collect", async (collected) => {
+          if (collected instanceof ButtonInteraction) {
+            const action = collected.customId.split(".")[1];
+            switch (action) {
+              case "next":
+                phase++;
+                break;
+              case "cancel":
+                collector.stop("cancelled");
+                return;
+              case "finish":
+                collector.stop();
+                return;
+              case "mode":
+                const temp = collected.customId.split(".")[2];
+                if (temp === "custom") {
+                  await collected.showModal(
+                    customExpressionModal(
+                      generateExpression(ruleIds, mode, expression)
+                    )
+                  );
+                  try {
+                    const modal = await collected.awaitModalSubmit({
+                      time: 150000,
+                      filter: (i) =>
+                        i.user.id === interaction.user.id &&
+                        i.customId === "cr.expression",
+                    });
+                    mode = "custom";
+                    expression = modal.fields.getTextInputValue("expression");
+                    await modal.deferUpdate();
+                  } catch (error) {
+                    return;
+                  }
+                } else {
+                  mode = temp === "or" ? "||" : "&&";
+                  expression = undefined;
+                  await collected.deferUpdate();
+                }
+                break;
+            }
+          } else {
+            ruleIds = ruleIds
+              .filter(
+                (r) =>
+                  !r
+                    .toLocaleLowerCase()
+                    .startsWith(
+                      collected.customId.split(".")[2].toLocaleLowerCase()
+                    )
+              )
+              .concat(collected.values);
+            await collected.deferUpdate();
+          }
+
+          await interaction.editReply({
+            embeds: [
+              createComplexRuleEmbed({
+                role,
+                rules: allRules,
+                selected: ruleIds,
+                phase,
+                expression: generateExpression(ruleIds, mode, expression),
+              }),
+            ],
+            components: createComplexRuleButtons(
+              phase,
+              allRules,
+              ruleIds,
+              mode
+            ),
+          });
+        }); // END COLLECTOR
+
+        const reason = await new Promise((resolve) => {
+          collector?.once("end", (_, reason) => resolve(reason));
+        });
+
+        if (reason === "time") {
+          await interaction.editReply({
+            content: "Complex rule creation timed out.",
+            embeds: [],
+            components: [],
+          });
+          return;
+        } else if (reason === "cancelled") {
+          await interaction.editReply({
+            content: "Complex rule creation cancelled.",
+            embeds: [],
+            components: [],
+          });
+          return;
+        }
+
+        await interaction.editReply({
+          content: "Creating complex rule...",
+          components: [],
+        });
+
+        try {
+          await api.addComplexRule({
+            role: role.id,
+            complexExpression: generateExpression(
+              ruleIds,
+              mode,
+              expression
+            ).replace(/ /g, ""),
+            discordServerId: interaction.guildId,
+          });
+        } catch (error: any) {
+          logger.error(error);
+          await interaction.editReply({
+            content:
+              "Could not create the rule for this server, please try again later.",
+          });
+          return;
+        }
+
+        await interaction.editReply({
+          content:
+            "Complex rule added successfully! Please note that it might take some time for the role to be assigned to users.",
+        });
+
+        break;
+
       case "view-rules":
         let getRulesResponse;
         try {
-          getRulesResponse = await api.getNftRules(interaction.guildId);
+          getRulesResponse = await api.getRules(interaction.guildId);
         } catch (e) {
           logger.error(e);
           await interaction.editReply({
@@ -631,6 +818,7 @@ export default {
             nftAddress: rule.address,
             apiUrl: rule.apiUrl,
             quantity: rule.quantity,
+            complexExpression: rule.complexExpression,
             role: roleName,
             tokenIds: rule.tokenIds,
             createdTimestamp: rule.createdAt,

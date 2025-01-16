@@ -46,3 +46,5 @@ export interface ModalData {
     interaction: ModalSubmitInteraction
   ) => Promise<void>;
 }
+
+export type ComplexRuleMode = "&&" | "||" | "custom";

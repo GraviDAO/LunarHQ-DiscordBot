@@ -1,5 +1,24 @@
-import { Colors, EmbedBuilder, time, User, userMention } from "discord.js";
-import { Poll, Proposal, ProposalChoice } from "../shared/apiTypes";
+import {
+  APIRole,
+  codeBlock,
+  Colors,
+  EmbedBuilder,
+  EmbedField,
+  inlineCode,
+  italic,
+  Role,
+  roleMention,
+  time,
+  unorderedList,
+  User,
+  userMention,
+} from "discord.js";
+import {
+  GenericRule,
+  Poll,
+  Proposal,
+  ProposalChoice,
+} from "../shared/apiTypes";
 import { toPascalCase } from "./helper";
 
 export function primaryEmbed(
@@ -131,7 +150,7 @@ export function pollsEmbed(polls: Poll[]) {
       return {
         name: p.title,
         value: `__Creator:__ ${userMention(p.creator)}(${p.creator})\n${
-          p.votes.yes.length + p.votes.no.length + p.votes.abstain.length ?? 0
+          p.votes.yes.length + p.votes.no.length + p.votes.abstain.length
         } votes`,
       };
     }),
@@ -161,6 +180,78 @@ export function lunarAssistantPanelEmbed() {
     description:
       "Lunar Assistant verifies your web3 ownership on Discord.\nLink your wallet to get started, leave the rest to us.\n:black_small_square: :white_small_square: :black_small_square: :white_small_square:\n*P.S. Don't be stupid, Never share seeds or keys. DYOR.*",
     color: 65535,
+    footer: {
+      text: "Built by GraviDAO",
+    },
+    thumbnail: {
+      url: "https://cdn.discordapp.com/attachments/911237611371241492/1011786559021907968/Lunar_Assistant_Mascotte_2.3.png",
+    },
+  });
+}
+
+export function createComplexRuleEmbed(data: {
+  role: Role | APIRole;
+  rules: GenericRule[];
+  selected: string[];
+  phase: number;
+  expression: string;
+}) {
+  const selectedRules = data.rules.filter((r) => data.selected.includes(r.id));
+
+  return new EmbedBuilder({
+    title: "Creating new Complex Rule",
+    description: "Please select all rules that must be met to unlock this role",
+    color: 65535,
+    fields: [
+      {
+        name: "Role",
+        value: roleMention(data.role.id),
+        inline: false,
+      },
+      {
+        name: "Rules Selected",
+        value:
+          selectedRules.length > 0
+            ? selectedRules.map((r) => r.id).join(", ")
+            : "No rules selected yet",
+        inline: true,
+      },
+      ...([
+        ...(data.phase === 1
+          ? [
+              {
+                name: "Expression",
+                value: codeBlock(data.expression),
+                inline: true,
+              },
+              {
+                name: "Guide",
+                value: `${italic(
+                  "How to setup rules:"
+                )}\nThere are 3 types of rules:\n${unorderedList([
+                  `${italic("AND")}: All rules must be met to unlock the role`,
+                  `${italic(
+                    "OR"
+                  )}: At least one rule must be met to unlock the role`,
+                  `${italic(
+                    "Custom"
+                  )}: You can write your own expression using the rules`,
+                ])}\n${italic("Examples:")}\n${codeBlock(
+                  "N-1 && N-2 || N-3"
+                )}${codeBlock("T-1 || T-2")}${codeBlock(
+                  "N-1 && T-1 || N-2"
+                )}\nYou can use ${inlineCode("&&")}, ${inlineCode(
+                  "||"
+                )} operators to combine rules and parentheses ${inlineCode(
+                  "("
+                )} or ${inlineCode(")")} to group them.`,
+                inline: false,
+              },
+            ]
+          : []),
+      ].filter(Boolean) as EmbedField[]),
+    ],
+
     footer: {
       text: "Built by GraviDAO",
     },

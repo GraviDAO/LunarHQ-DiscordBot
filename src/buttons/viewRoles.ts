@@ -4,7 +4,6 @@ import { api } from "../services/api";
 const logger = require("../logging/logger");
 
 export default {
-  
   customId: "viewRoles",
   execute: async (
     lunarAssistant: LunarAssistant,
@@ -17,7 +16,6 @@ export default {
     await interaction.deferReply({ ephemeral: true });
 
     try {
-      
       const guild = lunarAssistant.client.guilds.cache.get(interaction.guildId);
       if (!guild) return;
 
@@ -27,7 +25,7 @@ export default {
       if (member) {
         // Get list of roles from database to only include those in the output of the command.
         let getRulesResponse;
-        getRulesResponse = await api.getNftRules(interaction.guildId);
+        getRulesResponse = await api.getRules(interaction.guildId);
         let dbRoles: string[] = [];
         for (let indexR = 0; indexR < getRulesResponse.rules.length; indexR++) {
           const roleName = member.roles.cache.get(
@@ -48,7 +46,7 @@ export default {
 
       const message = `Hello ser! You currently have the following roles on this discord server:\n\n${activeRolesMessage}\n\nBuilt by GraviDAO`;
 
-//const message = `This feature has been temporarily disabled due to a bug. We are actively working on a fix.`
+      //const message = `This feature has been temporarily disabled due to a bug. We are actively working on a fix.`
       if (message.length > 2000) {
         await interaction.editReply({
           content:

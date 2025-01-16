@@ -78,3 +78,26 @@ export function proposalCreateModal() {
     ],
   });
 }
+
+export function customExpressionModal(expression?: string) {
+  return new ModalBuilder({
+    customId: "cr.expression",
+    title: "Custom Expression",
+    components: [
+      new ActionRowBuilder<TextInputBuilder>({
+        components: [
+          new TextInputBuilder({
+            customId: "expression",
+            label: "Custom Expression",
+            minLength: 1,
+            maxLength: 256,
+            placeholder: "Custom Expression",
+            required: true,
+            style: TextInputStyle.Paragraph,
+            value: expression,
+          }),
+        ],
+      }),
+    ],
+  });
+}

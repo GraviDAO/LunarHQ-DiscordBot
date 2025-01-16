@@ -73,11 +73,11 @@ export class LunarAssistant {
 const lunarAssistantBot = new LunarAssistant();
 
 // start the lunar assistant bot
-lunarAssistantBot.start(async () => {
+lunarAssistantBot.start(async (lunar) => {
   repository.saveCollections({
     abstractCollections: await api.getAllAbstractCollections(),
     indexedCollections: await api.getIndexedCollections(),
   });
-  console.log(repository.indexedCollections.slice(0, 5));
+  console.log(repository.indexedCollections.length);
   logger.info("Ready!");
 }, handle_interactions);

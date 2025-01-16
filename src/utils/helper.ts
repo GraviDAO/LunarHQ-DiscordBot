@@ -1,3 +1,5 @@
+import { ComplexRuleMode } from "../types";
+
 export function isValidHttpUrl(urlString: string) {
   let url;
   try {
@@ -24,4 +26,14 @@ export function shuffleArray<T>(array: T[]): T[] {
     [array[i], array[j]] = [array[j], array[i]];
   }
   return array;
+}
+
+export function generateExpression(
+  selected: string[],
+  mode: ComplexRuleMode,
+  custom?: string
+): string {
+  return mode === "custom"
+    ? custom ?? selected.join(" && ")
+    : selected.join(` ${mode} `);
 }

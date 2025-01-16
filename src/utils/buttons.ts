@@ -3,9 +3,12 @@ import {
   ButtonBuilder,
   ButtonStyle,
   SelectMenuBuilder,
+  StringSelectMenuBuilder,
 } from "discord.js";
 import chains from "../../blockchains.json";
 import { WEBAPP_URL, publicInfo } from "../../config.json";
+import { GenericRule } from "../shared/apiTypes";
+import { ComplexRuleMode } from "../types";
 
 export function castProposalVoteButtons(enabled: boolean = true) {
   return new ActionRowBuilder<ButtonBuilder>({
@@ -96,4 +99,107 @@ export function lunarAssistantPanelButtons() {
       }),
     ],
   });
+}
+
+export function createComplexRuleButtons(
+  phase: number,
+  all: GenericRule[],
+  selected: string[],
+  mode: ComplexRuleMode = "&&"
+): ActionRowBuilder<ButtonBuilder | StringSelectMenuBuilder>[] {
+  const nRules = all.filter((rule) => rule.id.startsWith("N"));
+  const tRules = all.filter((rule) => rule.id.startsWith("T"));
+
+  switch (phase) {
+    case 0: {
+      return [
+        new ActionRowBuilder<StringSelectMenuBuilder>({
+          components: [
+            new StringSelectMenuBuilder({
+              customId: "cr.rulePicker.n",
+              placeholder: "Select as many NFT Rules as you want",
+              minValues: Math.min(1, nRules.length),
+              maxValues: nRules.length,
+              options: nRules.map((rule) => ({
+                label: rule.id,
+                value: rule.id,
+                default: selected.includes(rule.id),
+              })),
+            }),
+          ],
+        }),
+        new ActionRowBuilder<StringSelectMenuBuilder>({
+          components: [
+            new StringSelectMenuBuilder({
+              customId: "cr.rulePicker.t",
+              placeholder: "Select as many Token Rules as you want",
+              minValues: Math.min(1, tRules.length),
+              maxValues: tRules.length,
+              options: tRules.map((rule) => ({
+                label: rule.id,
+                value: rule.id,
+                default: selected.includes(rule.id),
+              })),
+            }),
+          ],
+        }),
+        new ActionRowBuilder<ButtonBuilder>({
+          components: [
+            new ButtonBuilder({
+              customId: "cr.next",
+              label: "Next",
+              style: ButtonStyle.Primary,
+              disabled: selected.length < 2,
+            }),
+            new ButtonBuilder({
+              customId: "cr.cancel",
+              label: "Cancel",
+              style: ButtonStyle.Danger,
+            }),
+          ],
+        }),
+      ];
+    }
+    case 1: {
+      return [
+        new ActionRowBuilder<ButtonBuilder>({
+          components: [
+            new ButtonBuilder({
+              customId: "cr.mode.and",
+              label: "AND",
+              style:
+                mode === "&&" ? ButtonStyle.Success : ButtonStyle.Secondary,
+            }),
+            new ButtonBuilder({
+              customId: "cr.mode.or",
+              label: "OR",
+              style:
+                mode === "||" ? ButtonStyle.Success : ButtonStyle.Secondary,
+            }),
+            new ButtonBuilder({
+              customId: "cr.mode.custom",
+              label: "Custom",
+              style:
+                mode === "custom" ? ButtonStyle.Success : ButtonStyle.Secondary,
+            }),
+          ],
+        }),
+        new ActionRowBuilder<ButtonBuilder>({
+          components: [
+            new ButtonBuilder({
+              customId: "cr.finish",
+              label: "Finish",
+              style: ButtonStyle.Primary,
+            }),
+            new ButtonBuilder({
+              customId: "cr.cancel",
+              label: "Cancel",
+              style: ButtonStyle.Danger,
+            }),
+          ],
+        }),
+      ];
+    }
+  }
+  return [];
 }

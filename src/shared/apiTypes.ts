@@ -29,6 +29,7 @@ export interface GenericRule {
   role: string;
   tokenIds: string[] | null;
   apiUrl: string;
+  complexExpression: string | null;
   createdAt: Date;
 }
 
@@ -74,6 +75,14 @@ export interface apiRuleData {
   role: string;
   discordServerId: string;
   blockchainName: string;
+}
+
+export interface complexRuleData {
+  description?: string;
+  complexExpression: string;
+  role: string;
+  discordServerId: string;
+  discordChannelId?: string;
 }
 
 export interface CreateProposal {

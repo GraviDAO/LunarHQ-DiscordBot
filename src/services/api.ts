@@ -4,6 +4,7 @@ import { API_SECRET, lunarHQ_url } from "../../config.json";
 import {
   AbstractCollection,
   apiRuleData,
+  complexRuleData,
   CreateProposal,
   CreateProposalAddMsgId,
   GetProposalResultsResponse,
@@ -51,7 +52,7 @@ class API {
     ).data;
   }
 
-  async getNftRules(guildId: string): Promise<GetRulesResponse> {
+  async getRules(guildId: string): Promise<GetRulesResponse> {
     return (
       await this.get(
         "getRules",
@@ -108,6 +109,16 @@ class API {
       await this.post(
         "addApiRule",
         this.config(this.sign(data.discordServerId, ["addApiRule"])),
+        data
+      )
+    ).data;
+  }
+
+  async addComplexRule(data: complexRuleData): Promise<AxiosResponse> {
+    return (
+      await this.post(
+        "addComplexRule",
+        this.config(this.sign(data.discordServerId, ["addComplexRule"])),
         data
       )
     ).data;

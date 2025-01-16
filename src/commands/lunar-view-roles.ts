@@ -1,14 +1,8 @@
 import { SlashCommandBuilder } from "@discordjs/builders";
-import {
-  Attachment,
-  AttachmentBuilder,
-  ChatInputCommandInteraction,
-  CommandInteraction,
-  GuildMember,
-} from "discord.js";
+import { AttachmentBuilder, ChatInputCommandInteraction } from "discord.js";
 import { LunarAssistant } from "..";
 import { api } from "../services/api";
-const logger = require('../logging/logger');
+const logger = require("../logging/logger");
 
 export default {
   data: new SlashCommandBuilder()
@@ -38,35 +32,30 @@ export default {
 
     await interaction.deferReply({ ephemeral: privateResponse });
 
-    try
-    {
+    try {
       const guild = lunarAssistant.client.guilds.cache.get(interaction.guildId);
       if (!guild) return;
 
       let activeRolesMessage = "Your current roles on this server: ";
       // Get the member from the guild
-      let member = guild.members.cache.get(interaction.user.id)
-      if(member)
-      {
-
+      let member = guild.members.cache.get(interaction.user.id);
+      if (member) {
         // Get list of roles from database to only include those in the output of the command.
         let getRulesResponse;
-        getRulesResponse = await api.getNftRules(interaction.guildId);
+        getRulesResponse = await api.getRules(interaction.guildId);
         let dbRoles: string[] = [];
-        for(let indexR = 0; indexR < getRulesResponse.rules.length; indexR++)
-        {
-          const roleName = member.roles.cache.get(getRulesResponse.rules[indexR].role)?.name
-          if(roleName)
-          {
+        for (let indexR = 0; indexR < getRulesResponse.rules.length; indexR++) {
+          const roleName = member.roles.cache.get(
+            getRulesResponse.rules[indexR].role
+          )?.name;
+          if (roleName) {
             dbRoles.push(roleName);
           }
         }
 
-        for(let index = 0; index < member.roles.cache.size; index++ )
-        {
+        for (let index = 0; index < member.roles.cache.size; index++) {
           const role = member.roles.cache.at(index);
-          if(role && dbRoles.includes(role.name))
-          {
+          if (role && dbRoles.includes(role.name)) {
             activeRolesMessage = activeRolesMessage + role.name + ", ";
           }
         }
@@ -89,8 +78,7 @@ export default {
           content: message,
         });
       }
-    } catch (e)
-    {
+    } catch (e) {
       logger.error("Unknown error when running /lunar-view-roles:");
       logger.error(e);
 
