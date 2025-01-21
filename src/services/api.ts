@@ -7,6 +7,7 @@ import {
   complexRuleData,
   CreateProposal,
   CreateProposalAddMsgId,
+  DefinedAbstractCollection,
   GetProposalResultsResponse,
   GetProposalsResponse,
   GetRulesResponse,
@@ -43,6 +44,15 @@ class API {
     ).data;
   }
 
+  async getDefinedAbstractCollections(): Promise<DefinedAbstractCollection[]> {
+    return (
+      await this.get(
+        "abstractCollection/all/defined",
+        this.config(this.sign(undefined, ["getAbstractCollections"]))
+      )
+    ).data;
+  }
+
   async getIndexedCollections(): Promise<IndexedCollection[]> {
     return (
       await this.get(
@@ -74,14 +84,14 @@ class API {
     ).data;
   }
 
-  async addNftRule(data: nftRuleData): Promise<AxiosResponse> {
+  async addNftRule(data: nftRuleData): Promise<number> {
     return (
       await this.post(
         "addNftRule",
         this.config(this.sign(data.discordServerId, ["addNftRule"])),
         data
       )
-    ).data;
+    ).data.ruleId;
   }
 
   async addStakedNftRule(data: stakedNftRuleData): Promise<AxiosResponse> {

@@ -20,7 +20,10 @@ import {
 } from "../shared/apiTypes";
 import { ComplexRuleMode } from "../types";
 import { createComplexRuleButtons } from "../utils/buttons";
-import { createComplexRuleEmbed } from "../utils/embeds";
+import {
+  createComplexRuleEmbed,
+  createCrossChainRuleEmbed,
+} from "../utils/embeds";
 import {
   generateExpression,
   isValidHttpUrl,
@@ -29,6 +32,7 @@ import {
 import { isBlockchainEnabled } from "../utils/isBlockchainEnabled";
 import { isValidAddress } from "../utils/isValidAddress";
 import { customExpressionModal } from "../utils/modals";
+import { RULE_ID_REGEX } from "../utils/regex";
 const logger = require("../logging/logger");
 
 export default {
@@ -300,6 +304,35 @@ export default {
     )
     .addSubcommand((subcommand) =>
       subcommand
+        .setName("add-cross-chain-rule")
+        .setDescription(
+          "Adds a rule for granting a role to users based on cross-chain collections."
+        )
+        .addIntegerOption((option) =>
+          option
+            .setName("collection")
+            .setDescription(
+              "The collection to check for cross-chain ownership."
+            )
+            .setRequired(true)
+            .setAutocomplete(true)
+        )
+        .addRoleOption((option) =>
+          option
+            .setName("role")
+            .setDescription("The role to give to users which meet this rule.")
+            .setRequired(true)
+        )
+        .addNumberOption((option) =>
+          option
+            .setName("quantity")
+            .setDescription(
+              "The quantity of matching nfts that a user must hold in order to meet the rule. (Default: 1)"
+            )
+        )
+    )
+    .addSubcommand((subcommand) =>
+      subcommand
         .setName("view-rules")
         .setDescription("View the rules currently configured for the server.")
     )
@@ -314,6 +347,7 @@ export default {
             .setName("rule-id")
             .setDescription("The id of the rule to remove.")
             .setRequired(true)
+            .setAutocomplete(true)
         )
     ),
   execute: async (
@@ -378,7 +412,7 @@ export default {
         } catch {
           await interaction.editReply({
             content:
-              "Could not parse token ids, please list token ids using a coma , to seperate values like so: 152, 19, 421",
+              "Could not parse token ids, please list token ids using a coma , to separate values like so: 152, 19, 421",
           });
           return;
         }
@@ -786,6 +820,93 @@ export default {
 
         break;
 
+      case "add-cross-chain-rule": {
+        const collection = interaction.options.getInteger("collection", true);
+        const role = interaction.options.getRole("role", true);
+        const quantity = interaction.options.getInteger("quantity") ?? 1;
+
+        const definedAbstractCollection =
+          repository.definedAbstractCollections.find(
+            (c) => c.id === collection
+          );
+
+        if (!definedAbstractCollection) {
+          await interaction.editReply({
+            content: "Collection not found.",
+          });
+          return;
+        }
+
+        await interaction.editReply({
+          content: "Creating cross-chain rule...",
+          embeds: [createCrossChainRuleEmbed(definedAbstractCollection)],
+        });
+
+        const promises = definedAbstractCollection.collections.map(
+          async (c) => {
+            try {
+              return await api.addNftRule({
+                nftAddress: c.address,
+                tokenIds: [],
+                quantity: 1,
+                quantityOperatorName: "Greater Than Or Equals",
+                blockchainName: c.blockchain.name,
+                discordServerId: interaction.guildId!,
+                discordChannelId:
+                  typeof interaction.channel?.id! === "string"
+                    ? interaction.channel?.id!
+                    : "",
+                discordMessageId: "",
+                description: `Cross-chain rule for collection ${definedAbstractCollection.name}`,
+              });
+            } catch (e) {
+              logger.error(e);
+              return null;
+            }
+          }
+        );
+
+        const results = await Promise.all(promises);
+        if (results.some((r) => r === null)) {
+          await interaction.editReply({
+            content:
+              "Could not create the rule for this server, please try again later.",
+          });
+          return;
+        }
+
+        await interaction.editReply({
+          embeds: [createCrossChainRuleEmbed(definedAbstractCollection, 1)],
+        });
+
+        const ruleIds = results.map((r) => `N-${r}`);
+        const expression = ruleIds.join("||");
+
+        try {
+          await api.addComplexRule({
+            complexExpression: expression,
+            totalQuantityOverrideAndAssertIsORrule: quantity,
+            discordServerId: interaction.guildId!,
+            role: role.id,
+            description: `Cross-chain rule for collection ${
+              definedAbstractCollection.name
+            } :: ${ruleIds.join(",")}`,
+          });
+        } catch (error) {
+          logger.error(error);
+          await interaction.editReply({
+            content:
+              "Could not create the rule for this server, please try again later.",
+          });
+        }
+
+        await interaction.editReply({
+          content: "Cross-chain rule added successfully!",
+          embeds: [createCrossChainRuleEmbed(definedAbstractCollection, 3)],
+        });
+        break;
+      }
+
       case "view-rules":
         let getRulesResponse;
         try {
@@ -822,6 +943,7 @@ export default {
             role: roleName,
             tokenIds: rule.tokenIds,
             createdTimestamp: rule.createdAt,
+            description: rule.description,
           };
         });
 
@@ -837,7 +959,30 @@ export default {
         break;
 
       case "remove-rule":
-        ruleNumber = interaction.options.getString("rule-id", true);
+        ruleNumber = interaction.options
+          .getString("rule-id", true)
+          .toUpperCase();
+
+        let rules: GenericRule[] = [];
+        try {
+          rules.push(...(await api.getRules(interaction.guildId)).rules);
+        } catch (error) {
+          logger.error(error);
+        }
+        const r = rules.find((r) => r.id === ruleNumber);
+        let dependencies: GenericRule[] = [];
+        if (
+          ruleNumber.startsWith("C") &&
+          r?.complexExpression &&
+          r.description?.startsWith("Cross-chain rule") &&
+          r.description?.includes("::")
+        ) {
+          r.complexExpression.match(RULE_ID_REGEX)?.forEach((d) => {
+            const target = rules.find((r) => r.id === d);
+            if (target && (target.role === undefined || target.role === "none"))
+              dependencies.push(target);
+          });
+        }
 
         try {
           await api.deleteRule(interaction.guildId, ruleNumber);
@@ -849,6 +994,12 @@ export default {
           });
           return;
         }
+
+        await Promise.all(
+          dependencies.map(async (d) => {
+            await api.deleteRule(interaction.guildId!, d.id);
+          })
+        );
 
         // reply
         await interaction.editReply({
@@ -862,29 +1013,86 @@ export default {
     interaction: AutocompleteInteraction
   ) => {
     const focused = interaction.options.getFocused(true);
-    if (["token-address", "nft-address"].includes(focused.name)) {
-      const blockchainName = interaction.options.getString("blockchain", true);
-      const tokenAddress = focused.value;
+    switch (focused.name) {
+      case "token-address":
+      case "nft-address": {
+        const blockchainName = interaction.options.getString(
+          "blockchain",
+          true
+        );
+        const tokenAddress = focused.value;
 
-      const filtered = repository
-        .getIndexCollectionByChain(blockchainName)
-        .filter(
+        const filtered = repository
+          .getIndexCollectionByChain(blockchainName)
+          .filter(
+            (c) =>
+              tokenAddress === "" ||
+              c.address.toLowerCase().includes(tokenAddress.toLowerCase()) ||
+              c.name.toLowerCase().includes(tokenAddress.toLowerCase())
+          );
+
+        const shuffledArray = shuffleArray(filtered).slice(0, 10);
+
+        interaction.respond(
+          shuffledArray.map((c) => ({
+            name: `${c.name} - (${c.address.slice(0, 6)}...${c.address.slice(
+              -4
+            )})`,
+            value: c.address,
+          }))
+        );
+        break;
+      }
+      case "collection": {
+        const collectionAddress = focused.value;
+
+        const filtered = repository.definedAbstractCollections.filter(
           (c) =>
-            tokenAddress === "" ||
-            c.address.toLowerCase().includes(tokenAddress.toLowerCase()) ||
-            c.name.toLowerCase().includes(tokenAddress.toLowerCase())
+            collectionAddress === "" ||
+            c.name.toLowerCase().includes(collectionAddress.toLowerCase()) ||
+            c.collections.find(
+              (col) =>
+                col.address
+                  .toLowerCase()
+                  .includes(collectionAddress.toLowerCase()) ||
+                col.name.toLowerCase().includes(collectionAddress.toLowerCase())
+            )
         );
 
-      const shuffledArray = shuffleArray(filtered).slice(0, 10);
+        const shuffledArray = shuffleArray(filtered).slice(0, 10);
+        interaction.respond(
+          shuffledArray.map((c) => ({
+            name: `${c.name} - (${c.collections.length} collections)`,
+            value: c.id,
+          }))
+        );
+        break;
+      }
+      case "rule-id": {
+        let getRulesResponse;
+        try {
+          getRulesResponse = await api.getRules(interaction.guildId!);
+        } catch (e) {
+          logger.error(e);
+        }
+        const serverRules = getRulesResponse?.rules ?? [];
 
-      interaction.respond(
-        shuffledArray.map((c) => ({
-          name: `${c.name} - (${c.address.slice(0, 6)}...${c.address.slice(
-            -4
-          )})`,
-          value: c.address,
-        }))
-      );
+        const ruleId = focused.value;
+
+        interaction.respond(
+          serverRules
+            .filter(
+              (r) =>
+                ruleId === "" ||
+                r.id.toLocaleLowerCase().includes(ruleId.toLocaleLowerCase())
+            )
+            .map((rule) => ({
+              name: rule.id,
+              value: rule.id,
+            }))
+            .slice(0, 24)
+        );
+      }
     }
   },
 };

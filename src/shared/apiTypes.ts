@@ -22,6 +22,7 @@ export type NftCollection = {
 
 export interface GenericRule {
   id: string;
+  description?: string;
   blockchainName: string;
   address: string;
   quantity: number | null;
@@ -38,11 +39,12 @@ export interface GetRulesResponse {
 }
 
 export interface nftRuleData {
+  description?: string;
   nftAddress: string;
   tokenIds: string[];
   quantity: number;
   quantityOperatorName: string;
-  role: string;
+  role?: string;
   discordServerId: string;
   blockchainName: string;
   discordChannelId: string;
@@ -80,6 +82,7 @@ export interface apiRuleData {
 export interface complexRuleData {
   description?: string;
   complexExpression: string;
+  totalQuantityOverrideAndAssertIsORrule?: number;
   role: string;
   discordServerId: string;
   discordChannelId?: string;
@@ -195,10 +198,16 @@ export interface Blockchain {
 export interface AbstractCollection {
   chainName: string;
   chainId: string;
+  collections: SimpleAbstractCollection[];
+}
+
+export interface DefinedAbstractCollection {
+  name: string;
+  id: number;
   collections: FullAbstractCollection[];
 }
 
-export interface FullAbstractCollection {
+export interface SimpleAbstractCollection {
   name: string;
   symbol: string;
   address: string;
@@ -208,4 +217,8 @@ export interface FullAbstractCollection {
   creator: string;
   minter: string;
   codeId: number;
+}
+
+export interface FullAbstractCollection extends SimpleAbstractCollection {
+  blockchain: Blockchain;
 }

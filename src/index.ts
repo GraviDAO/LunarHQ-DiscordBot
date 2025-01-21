@@ -76,8 +76,8 @@ const lunarAssistantBot = new LunarAssistant();
 lunarAssistantBot.start(async (lunar) => {
   repository.saveCollections({
     abstractCollections: await api.getAllAbstractCollections(),
+    definedAbstractCollections: await api.getDefinedAbstractCollections(),
     indexedCollections: await api.getIndexedCollections(),
   });
-  console.log(repository.indexedCollections.length);
   logger.info("Ready!");
 }, handle_interactions);

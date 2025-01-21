@@ -14,6 +14,7 @@ import {
   userMention,
 } from "discord.js";
 import {
+  DefinedAbstractCollection,
   GenericRule,
   Poll,
   Proposal,
@@ -258,5 +259,40 @@ export function createComplexRuleEmbed(data: {
     thumbnail: {
       url: "https://cdn.discordapp.com/attachments/911237611371241492/1011786559021907968/Lunar_Assistant_Mascotte_2.3.png",
     },
+  });
+}
+
+export function createCrossChainRuleEmbed(
+  abstract: DefinedAbstractCollection,
+  phase: number = 0
+) {
+  const chainIds = new Set<string>(
+    abstract.collections.map((c) => c.blockchain.chainId)
+  );
+  return new EmbedBuilder({
+    title: "Creating new Cross Chain Rule",
+    description: "Collection: " + abstract.name,
+    color: 65535,
+    fields: [
+      {
+        name: "Individual Collections",
+        value: `This cross-chain collection contains ${
+          abstract.collections.length
+        } individual collections across ${
+          chainIds.size
+        } different blockchains:\n${unorderedList(
+          abstract.collections.map((c) => `${c.name} (${c.blockchain.name})`)
+        )}`,
+      },
+      {
+        name: "Progress",
+        value:
+          phase === 0
+            ? "Creating secondary rules"
+            : phase === 1
+            ? "Creating primary rule"
+            : `Created ${abstract.collections.length + 1} rules`,
+      },
+    ],
   });
 }
