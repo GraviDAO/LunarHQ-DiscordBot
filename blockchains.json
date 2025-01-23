@@ -13,10 +13,10 @@
     "value": "Terra Classic",
     "name": "Terra Classic",
     "chainId": "columbus-5",
-    "enabled": true,
+    "enabled": false,
     "support": {
       "nftRule": true,
-      "tokenRule": false
+      "tokenRule": true
     }
   },
   "polygon": {
@@ -36,14 +36,14 @@
     "enabled": true,
     "support": {
       "nftRule": true,
-      "tokenRule": false
+      "tokenRule": true
     }
   },
   "archway": {
     "value": "Archway",
     "name": "Archway",
     "chainId": "archway-1",
-    "enabled": false,
+    "enabled": true,
     "support": {
       "nftRule": true,
       "tokenRule": true
@@ -53,7 +53,7 @@
     "value": "Juno",
     "name": "Juno",
     "chainId": "juno-1",
-    "enabled": false,
+    "enabled": true,
     "support": {
       "nftRule": true,
       "tokenRule": true
@@ -63,7 +63,7 @@
     "value": "Osmosis",
     "name": "Osmosis",
     "chainId": "osmosis-1",
-    "enabled": false,
+    "enabled": true,
     "support": {
       "nftRule": true,
       "tokenRule": true
@@ -73,7 +73,7 @@
     "value": "Neutron",
     "name": "Neutron",
     "chainId": "neutron-1",
-    "enabled": false,
+    "enabled": true,
     "support": {
       "nftRule": true,
       "tokenRule": true
@@ -86,14 +86,14 @@
     "enabled": true,
     "support": {
       "nftRule": true,
-      "tokenRule": true
+      "tokenRule": false
     }
   },
   "migaloo": {
     "value": "Migaloo",
     "name": "Migaloo",
     "chainId": "migaloo-1",
-    "enabled": false,
+    "enabled": true,
     "support": {
       "nftRule": true,
       "tokenRule": true
