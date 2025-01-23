@@ -605,7 +605,8 @@ export default {
 
         // reply
         await interaction.editReply({
-          content: "Rule added successfully!",
+          content:
+            "Rule added successfully! This is for CW20 Tokens and **not NFTs**",
         });
         break;
 

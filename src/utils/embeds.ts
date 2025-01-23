@@ -213,7 +213,14 @@ export function createComplexRuleEmbed(data: {
         name: "Rules Selected",
         value:
           selectedRules.length > 0
-            ? selectedRules.map((r) => r.id).join(", ")
+            ? selectedRules
+                .map(
+                  (r) =>
+                    `${r.id}${
+                      r.role && r.role !== "" ? ` (${roleMention(r.role)})` : ""
+                    }`
+                )
+                .join(", ")
             : "No rules selected yet",
         inline: true,
       },
@@ -281,7 +288,12 @@ export function createCrossChainRuleEmbed(
         } individual contracts across ${
           chainIds.size
         } different blockchains:\n${unorderedList(
-          abstract.collections.map((c) => `${c.name} (${c.blockchain.name})`)
+          abstract.collections.map(
+            (c) =>
+              `${c.name} (${c.blockchain.name}${
+                c.homeCollection ? ", Home Collection" : ""
+              })`
+          )
         )}`,
       },
       {
