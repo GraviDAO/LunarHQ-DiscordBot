@@ -986,11 +986,13 @@ export default {
 
         try {
           await api.deleteRule(interaction.guildId, ruleNumber);
-        } catch (e) {
+        } catch (e: any) {
           logger.error(e);
+          const error = e.response?.data?.message;
           await interaction.editReply({
             content:
-              "Could not delete the rule for this server, please try again later.",
+              error ??
+              "Could not delete the rule for this server, try again later.",
           });
           return;
         }

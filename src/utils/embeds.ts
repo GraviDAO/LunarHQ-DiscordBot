@@ -201,7 +201,7 @@ export function createComplexRuleEmbed(data: {
 
   return new EmbedBuilder({
     title: "Creating new Complex Rule",
-    description: "Please select all rules that must be met to unlock this role",
+    description: "Please select all rules that should be part of this rule",
     color: 65535,
     fields: [
       {
@@ -275,10 +275,10 @@ export function createCrossChainRuleEmbed(
     color: 65535,
     fields: [
       {
-        name: "Individual Collections",
+        name: "Individual Contracts",
         value: `This cross-chain collection contains ${
           abstract.collections.length
-        } individual collections across ${
+        } individual contracts across ${
           chainIds.size
         } different blockchains:\n${unorderedList(
           abstract.collections.map((c) => `${c.name} (${c.blockchain.name})`)
