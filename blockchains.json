@@ -98,5 +98,15 @@
       "nftRule": true,
       "tokenRule": true
     }
+  },
+  "cosmos": {
+    "value": "Cosmos",
+    "name": "Cosmos",
+    "chainId": "cosmoshub-4",
+    "enabled": true,
+    "support": {
+      "nftRule": true,
+      "tokenRule": true
+    }
   }
 }
