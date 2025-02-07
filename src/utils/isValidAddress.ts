@@ -34,6 +34,10 @@ const isValidMigalooAddress = (address: string) => {
   return /^migaloo1[a-z0-9]{58}$/.test(address);
 };
 
+const isValidCosmosAddress = (address: string) => {
+  return /(cosmos1([a-z0-9]{38}))/g.test(address);
+};
+
 export const isValidAddress = (address: string, blockchainName: string) => {
   switch (blockchainName) {
     case "Terra":
@@ -55,6 +59,8 @@ export const isValidAddress = (address: string, blockchainName: string) => {
       return isValidInjectiveAddress(address);
     case "Migaloo":
       return isValidMigalooAddress(address);
+    case "Cosmos":
+      return isValidCosmosAddress(address);
     default:
       return false;
   }
