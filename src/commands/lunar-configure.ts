@@ -824,7 +824,7 @@ export default {
       case "add-cross-chain-rule": {
         const collection = interaction.options.getInteger("collection", true);
         const role = interaction.options.getRole("role", true);
-        const quantity = interaction.options.getInteger("quantity") ?? 1;
+        const quantity = interaction.options.getNumber("quantity") ?? 1;
 
         const definedAbstractCollection =
           repository.definedAbstractCollections.find(
