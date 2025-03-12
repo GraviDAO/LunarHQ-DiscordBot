@@ -86,6 +86,7 @@ export interface complexRuleData {
   role: string;
   discordServerId: string;
   discordChannelId?: string;
+  abstractCollectionId?: number;
 }
 
 export interface CreateProposal {

@@ -892,6 +892,7 @@ export default {
             description: `Cross-chain rule for collection ${
               definedAbstractCollection.name
             } :: ${ruleIds.join(",")}`,
+            abstractCollectionId: definedAbstractCollection.id,
           });
         } catch (error) {
           logger.error(error);
